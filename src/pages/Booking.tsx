@@ -7,6 +7,7 @@ import { DatePicker } from '@/components/booking/DatePicker'
 import { TimePicker } from '@/components/booking/TimePicker'
 import { CustomerForm } from '@/components/booking/CustomerForm'
 import { PaymentSelector } from '@/components/booking/PaymentSelector'
+import { StripePaymentForm } from '@/components/booking/StripePaymentForm'
 import { ConfirmScreen } from '@/components/booking/ConfirmScreen'
 
 const STEP_LABELS = ['Service', 'Date', 'Time', 'Your Details', 'Payment']
@@ -47,6 +48,9 @@ const StepIndicator = ({ current }: { current: number }) => (
 const Booking = () => {
   const booking = useBooking()
 
+  // Once Stripe form is showing, the booking exists — don't allow going back
+  const canGoBack = booking.step > 1 && booking.step < 6 && !booking.stripeClientSecret
+
   return (
     <Layout>
       {/* Page header */}
@@ -62,8 +66,8 @@ const Booking = () => {
         {/* Step indicator — hidden on confirmation screen */}
         {booking.step < 6 && <StepIndicator current={booking.step} />}
 
-        {/* Back button + error banner */}
-        {booking.step > 1 && booking.step < 6 && (
+        {/* Back button — hidden once Stripe form is active (booking already exists) */}
+        {canGoBack && (
           <Button
             variant="ghost"
             size="sm"
@@ -125,12 +129,20 @@ const Booking = () => {
           />
         )}
 
-        {/* Step 5: Payment method + submit */}
-        {booking.step === 5 && booking.selectedPrice && (
+        {/* Step 5a: Payment method selector */}
+        {booking.step === 5 && booking.selectedPrice && !booking.stripeClientSecret && (
           <PaymentSelector
             amount={booking.selectedPrice.priceEur}
             onSelect={method => booking.submit(method)}
             submitting={booking.submitting}
+          />
+        )}
+
+        {/* Step 5b: Stripe Elements form (shown after PaymentIntent is created) */}
+        {booking.step === 5 && booking.stripeClientSecret && (
+          <StripePaymentForm
+            clientSecret={booking.stripeClientSecret}
+            onSuccess={booking.completeStripePayment}
           />
         )}
 
