@@ -52,6 +52,9 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --slot-available: 145 63% 42%;
+    --slot-booked: 5 74% 56%;
   }
 }
 
@@ -82,5 +85,19 @@
   }
   .shadow-card {
     box-shadow: var(--shadow-card);
+  }
+  .slot-available {
+    color: hsl(var(--slot-available));
+    border-color: hsl(var(--slot-available));
+  }
+  .slot-booked {
+    color: hsl(var(--slot-booked));
+    border-color: hsl(var(--slot-booked));
+  }
+  .bg-slot-available {
+    background-color: hsl(var(--slot-available) / 0.1);
+  }
+  .bg-slot-booked {
+    background-color: hsl(var(--slot-booked) / 0.1);
   }
 }
