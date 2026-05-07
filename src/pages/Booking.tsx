@@ -7,7 +7,6 @@ import { DatePicker } from '@/components/booking/DatePicker'
 import { TimePicker } from '@/components/booking/TimePicker'
 import { CustomerForm } from '@/components/booking/CustomerForm'
 import { PaymentSelector } from '@/components/booking/PaymentSelector'
-import { StripePaymentForm } from '@/components/booking/StripePaymentForm'
 import { ConfirmScreen } from '@/components/booking/ConfirmScreen'
 
 const STEP_LABELS = ['Service', 'Date', 'Time', 'Your Details', 'Payment']
@@ -48,12 +47,11 @@ const StepIndicator = ({ current }: { current: number }) => (
 const Booking = () => {
   const booking = useBooking()
 
-  // Once Stripe form is showing, the booking exists — don't allow going back
-  const canGoBack = booking.step > 1 && booking.step < 6 && !booking.stripeClientSecret
+  // Once a booking exists the slot is locked — prevent going back
+  const canGoBack = booking.step > 1 && booking.step < 6 && !booking.bookingResult
 
   return (
     <Layout>
-      {/* Page header */}
       <section className="gradient-hero py-10">
         <div className="container text-center">
           <Flower2 className="h-6 w-6 text-primary mx-auto mb-2" />
@@ -63,10 +61,8 @@ const Booking = () => {
       </section>
 
       <section className="container py-10 max-w-3xl mx-auto px-4">
-        {/* Step indicator — hidden on confirmation screen */}
         {booking.step < 6 && <StepIndicator current={booking.step} />}
 
-        {/* Back button — hidden once Stripe form is active (booking already exists) */}
         {canGoBack && (
           <Button
             variant="ghost"
@@ -84,7 +80,6 @@ const Booking = () => {
           </div>
         )}
 
-        {/* Step 1: Choose service + duration */}
         {booking.step === 1 && (
           <ServicePicker
             onSelect={(service, price) => {
@@ -95,7 +90,6 @@ const Booking = () => {
           />
         )}
 
-        {/* Step 2: Choose date */}
         {booking.step === 2 && (
           <DatePicker
             onSelect={date => {
@@ -105,7 +99,6 @@ const Booking = () => {
           />
         )}
 
-        {/* Step 3: Choose time slot */}
         {booking.step === 3 && booking.selectedDate && (
           <TimePicker
             date={booking.selectedDate}
@@ -116,7 +109,6 @@ const Booking = () => {
           />
         )}
 
-        {/* Step 4: Customer details */}
         {booking.step === 4 && (
           <CustomerForm
             initialName={booking.customerName}
@@ -129,24 +121,21 @@ const Booking = () => {
           />
         )}
 
-        {/* Step 5a: Payment method selector */}
-        {booking.step === 5 && booking.selectedPrice && !booking.stripeClientSecret && (
+        {/* Step 5 — PaymentSelector owns the full payment flow:
+            - on_site: calls onSelect → submit creates booking → step 6
+            - stripe:  calls onSelect → submit creates booking → bookingId prop arrives
+                       → PaymentSelector fetches client_secret → shows Stripe Elements inline
+                       → confirmPayment redirects to /booking/success                    */}
+        {booking.step === 5 && booking.selectedPrice && (
           <PaymentSelector
             amount={booking.selectedPrice.priceEur}
+            bookingId={booking.bookingResult?.booking_id ?? ''}
+            bookingRef={booking.bookingResult?.booking_ref ?? ''}
             onSelect={method => booking.submit(method)}
             submitting={booking.submitting}
           />
         )}
 
-        {/* Step 5b: Stripe Elements form (shown after PaymentIntent is created) */}
-        {booking.step === 5 && booking.stripeClientSecret && (
-          <StripePaymentForm
-            clientSecret={booking.stripeClientSecret}
-            onSuccess={booking.completeStripePayment}
-          />
-        )}
-
-        {/* Step 6: Confirmation */}
         {booking.step === 6
           && booking.bookingResult
           && booking.selectedService

@@ -1,79 +1,194 @@
-import { useState } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { CreditCard, Banknote, Loader2 } from 'lucide-react'
+import { CreditCard, Banknote, Loader2, Lock } from 'lucide-react'
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { stripePromise } from '@/lib/stripe'
+
+// Rendered inside <Elements> once clientSecret is available
+interface StripeFormProps {
+  amount: number
+  onError: (msg: string) => void
+}
+
+const StripeInnerForm = ({ amount, onError }: StripeFormProps) => {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!stripe || !elements) return
+    setLoading(true)
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${import.meta.env.VITE_APP_URL}/booking/success`,
+      },
+    })
+
+    // Only reaches here if redirect didn't happen (error case)
+    if (error) {
+      onError(error.message ?? 'Payment failed. Please try again.')
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      <PaymentElement options={{ layout: 'tabs' }} />
+      <Button
+        type="submit"
+        disabled={!stripe || !elements || loading}
+        className="w-full gradient-purple text-primary-foreground py-3 text-base"
+      >
+        {loading
+          ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing…</>
+          : <><Lock className="mr-2 h-4 w-4" /> Pay €{amount.toFixed(2)}</>
+        }
+      </Button>
+    </form>
+  )
+}
 
 interface Props {
   amount: number
+  bookingId: string    // empty until parent creates the booking on stripe click
+  bookingRef: string   // for display
   onSelect: (method: 'stripe' | 'on_site') => void
-  submitting?: boolean
+  submitting?: boolean // true while parent is creating the booking
 }
 
-type Method = 'stripe' | 'on_site'
+export const PaymentSelector = ({
+  amount, bookingId, bookingRef, onSelect, submitting = false,
+}: Props) => {
+  const [pendingStripe, setPendingStripe] = useState(false)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [fetchingSecret, setFetchingSecret] = useState(false)
+  const [stripeError, setStripeError] = useState<string | null>(null)
 
-const OPTIONS: { id: Method; label: string; sub: string; Icon: React.ElementType; detail: (amount: number) => string }[] = [
-  {
-    id: 'stripe',
-    label: 'Pay by card',
-    sub: 'Secure online payment',
-    Icon: CreditCard,
-    detail: (a) => `${a} €`,
-  },
-  {
-    id: 'on_site',
-    label: 'Pay on-site',
-    sub: 'Pay when you arrive',
-    Icon: Banknote,
-    detail: () => 'Cash or card',
-  },
-]
+  const handleCardClick = () => {
+    if (pendingStripe || clientSecret || submitting) return
+    setPendingStripe(true)
+    setFetchingSecret(true)
+    onSelect('stripe') // parent creates booking; bookingId prop will arrive on next render
+  }
 
-export const PaymentSelector = ({ amount, onSelect, submitting = false }: Props) => {
-  const [method, setMethod] = useState<Method | null>(null)
+  // Once bookingId arrives from the parent (after booking creation), fetch client_secret
+  useEffect(() => {
+    if (!pendingStripe || !bookingId) return
+
+    const fetchSecret = async () => {
+      try {
+        const res = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ booking_id: bookingId }),
+        })
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          throw new Error(data.error || 'Payment setup failed')
+        }
+        const { client_secret } = await res.json()
+        setClientSecret(client_secret)
+        setStripeError(null)
+      } catch (err) {
+        setStripeError(err instanceof Error ? err.message : 'Payment setup failed')
+        setPendingStripe(false)
+      } finally {
+        setFetchingSecret(false)
+      }
+    }
+
+    fetchSecret()
+  }, [pendingStripe, bookingId])
+
+  const isLoading = submitting || fetchingSecret
+  const stripeActive = pendingStripe || !!clientSecret
 
   return (
     <div>
-      <h2 className="font-serif text-2xl text-primary-deep mb-6">Payment Method</h2>
+      <h2 className="font-serif text-2xl text-primary-deep mb-2">Payment Method</h2>
+
+      {bookingRef && (
+        <p className="text-xs text-muted-foreground mb-6">
+          Booking ref:{' '}
+          <span className="font-mono font-bold text-primary tracking-wide">{bookingRef}</span>
+        </p>
+      )}
+
       <div className="grid sm:grid-cols-2 gap-4 max-w-md">
-        {OPTIONS.map(opt => {
-          const isSelected = method === opt.id
-          return (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => setMethod(opt.id)}
-              className={`
-                rounded-2xl border-2 p-6 text-left transition-all
-                ${isSelected
-                  ? 'border-primary bg-secondary/60 shadow-soft'
-                  : 'border-border bg-card hover:border-primary/40'
-                }
-              `}
-            >
-              <opt.Icon className={`h-8 w-8 mb-3 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-              <div className={`font-semibold ${isSelected ? 'text-primary-deep' : 'text-foreground'}`}>
-                {opt.label}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">{opt.sub}</div>
-              <div className={`text-xl font-bold mt-2 ${isSelected ? 'text-primary' : 'text-foreground/70'}`}>
-                {opt.detail(amount)}
-              </div>
-            </button>
-          )
-        })}
+        {/* Pay by card */}
+        <button
+          type="button"
+          onClick={handleCardClick}
+          disabled={isLoading || !!clientSecret}
+          className={`
+            rounded-2xl border-2 p-6 text-left transition-all
+            ${stripeActive
+              ? 'border-primary bg-secondary/60 shadow-soft'
+              : 'border-border bg-card hover:border-primary/40'
+            }
+            disabled:cursor-not-allowed
+          `}
+        >
+          {isLoading && stripeActive
+            ? <Loader2 className="h-8 w-8 mb-3 text-primary animate-spin" />
+            : <CreditCard className={`h-8 w-8 mb-3 ${stripeActive ? 'text-primary' : 'text-muted-foreground'}`} />
+          }
+          <div className={`font-semibold ${stripeActive ? 'text-primary-deep' : 'text-foreground'}`}>
+            Pay by card
+          </div>
+          <div className="text-sm text-muted-foreground mt-1">Secure online payment</div>
+          <div className={`text-xl font-bold mt-2 ${stripeActive ? 'text-primary' : 'text-foreground/70'}`}>
+            €{amount.toFixed(2)}
+          </div>
+        </button>
+
+        {/* Pay on-site */}
+        <button
+          type="button"
+          onClick={() => onSelect('on_site')}
+          disabled={isLoading || !!clientSecret}
+          className={`
+            rounded-2xl border-2 p-6 text-left transition-all
+            border-border bg-card hover:border-primary/40
+            disabled:opacity-40 disabled:cursor-not-allowed
+          `}
+        >
+          <Banknote className="h-8 w-8 mb-3 text-muted-foreground" />
+          <div className="font-semibold text-foreground">Pay on-site</div>
+          <div className="text-sm text-muted-foreground mt-1">Pay when you arrive</div>
+          <div className="text-xl font-bold mt-2 text-foreground/70">Cash or card</div>
+        </button>
       </div>
 
-      {method && (
-        <div className="mt-8">
-          <Button
-            onClick={() => onSelect(method)}
-            disabled={submitting}
-            className="gradient-purple text-primary-foreground px-8 py-3 text-base"
+      {stripeError && (
+        <div className="mt-4 max-w-md bg-destructive/10 text-destructive border border-destructive/20 rounded-xl px-4 py-3 text-sm">
+          {stripeError}
+        </div>
+      )}
+
+      {/* Stripe Elements — rendered inline once clientSecret is ready */}
+      {clientSecret && (
+        <div className="mt-6 max-w-md">
+          <Elements
+            stripe={stripePromise}
+            options={{
+              clientSecret,
+              appearance: {
+                theme: 'stripe',
+                variables: {
+                  colorPrimary: '#5A2A83',
+                  colorBackground: '#ffffff',
+                  fontFamily: 'Inter, sans-serif',
+                  borderRadius: '8px',
+                },
+              },
+            }}
           >
-            {submitting
-              ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Confirming…</>
-              : 'Confirm Booking →'
-            }
-          </Button>
+            <StripeInnerForm amount={amount} onError={setStripeError} />
+          </Elements>
         </div>
       )}
     </div>

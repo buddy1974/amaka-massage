@@ -30,7 +30,6 @@ export function useBooking() {
   const [customerPhone, setCustomerPhone] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'on_site' | null>(null)
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null)
-  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -40,17 +39,13 @@ export function useBooking() {
     setStep(s => Math.max(s - 1, 1) as BookingStep)
   }
 
-  // Called after Stripe payment succeeds in StripePaymentForm
-  const completeStripePayment = () => setStep(6)
-
   const submit = async (method: 'stripe' | 'on_site') => {
     if (!selectedService || !selectedPrice || !selectedSlot) return
     setSubmitting(true)
     setSubmitError(null)
 
     try {
-      // Step 1: Create the booking (locks the slot for 15 min)
-      const bookingRes = await fetch('/api/bookings', {
+      const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -63,42 +58,26 @@ export function useBooking() {
         }),
       })
 
-      if (bookingRes.status === 409) {
+      if (res.status === 409) {
         setSubmitError('This slot was just taken. Please choose another time.')
         setStep(3)
         return
       }
 
-      if (!bookingRes.ok) {
-        const data = await bookingRes.json().catch(() => ({}))
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
         throw new Error(data.error || 'Booking failed. Please try again.')
       }
 
-      const bookingData: BookingResult = await bookingRes.json()
-      setBookingResult(bookingData)
+      const data: BookingResult = await res.json()
+      setBookingResult(data)
       setPaymentMethod(method)
 
       if (method === 'on_site') {
-        // On-site: done — go straight to confirmation
-        setStep(6)
-        return
+        setStep(6) // on-site: go straight to confirmation
       }
-
-      // Stripe: fetch a PaymentIntent client_secret, then show Elements form
-      const intentRes = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ booking_id: bookingData.booking_id }),
-      })
-
-      if (!intentRes.ok) {
-        const data = await intentRes.json().catch(() => ({}))
-        throw new Error(data.error || 'Could not initialise payment. Please try again.')
-      }
-
-      const { client_secret } = await intentRes.json()
-      setStripeClientSecret(client_secret)
-      // Stay on step 5 — StripePaymentForm will render
+      // stripe: stay on step 5 — PaymentSelector receives the new bookingId prop
+      // and handles fetching the client_secret + showing Stripe Elements
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
@@ -109,9 +88,9 @@ export function useBooking() {
   return {
     step, selectedService, selectedPrice, selectedDate, selectedSlot,
     customerName, customerPhone, paymentMethod, bookingResult,
-    stripeClientSecret, submitting, submitError,
+    submitting, submitError,
     setSelectedService, setSelectedPrice, setSelectedDate, setSelectedSlot,
     setCustomerName, setCustomerPhone,
-    next, back, submit, completeStripePayment,
+    next, back, submit,
   }
 }
