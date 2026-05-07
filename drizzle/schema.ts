@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, boolean, date, time, timestamptz, numeric, integer } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, boolean, date, time, timestamp, numeric, integer, unique } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 export const services = pgTable('services', {
@@ -7,7 +7,7 @@ export const services = pgTable('services', {
   description: text('description'),
   slug: text('slug').unique(),
   isActive: boolean('is_active').default(true),
-  createdAt: timestamptz('created_at').default(sql`now()`),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
 })
 
 export const servicePrices = pgTable('service_prices', {
@@ -22,8 +22,10 @@ export const timeSlots = pgTable('time_slots', {
   slotDate: date('slot_date').notNull(),
   slotTime: time('slot_time').notNull(),
   isAvailable: boolean('is_available').default(true),
-  lockedUntil: timestamptz('locked_until'),
-})
+  lockedUntil: timestamp('locked_until', { withTimezone: true }),
+}, (t) => [
+  unique().on(t.slotDate, t.slotTime),
+])
 
 export const bookings = pgTable('bookings', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
@@ -37,5 +39,5 @@ export const bookings = pgTable('bookings', {
   stripePaymentIntentId: text('stripe_payment_intent_id'),
   bookingStatus: text('booking_status').default('pending'),
   telegramMsgId: integer('telegram_msg_id'),
-  createdAt: timestamptz('created_at').default(sql`now()`),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
 })
