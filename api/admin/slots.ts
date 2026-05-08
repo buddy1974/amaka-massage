@@ -3,6 +3,7 @@ import { jwtVerify } from 'jose'
 import { db } from '../../src/lib/neon'
 import { timeSlots } from '../../drizzle/schema'
 import { eq, and, gte, lte } from 'drizzle-orm'
+import { getSlotsForDate, isOpenDay } from '../../src/lib/openingHours'
 
 async function verifyAdmin(req: VercelRequest): Promise<boolean> {
   try {
@@ -42,14 +43,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'date or from+to required' })
   }
 
-  // POST — bulk-create slots for a day { date, times: ["10:00","11:00",...] }
+  // POST — bulk-create slots for a day { date }
+  // Times are computed automatically from opening hours — any passed `times` array is ignored.
   if (req.method === 'POST') {
-    const { date, times } = req.body as { date?: string; times?: string[] }
-    if (!date || !Array.isArray(times) || times.length === 0)
-      return res.status(400).json({ error: 'date and times[] required' })
+    const { date } = req.body as { date?: string }
+    if (!date) return res.status(400).json({ error: 'date required' })
+
+    const dow = new Date(date + 'T00:00:00').getDay()
+    if (!isOpenDay(dow))
+      return res.status(400).json({ error: 'Closed on this day — no slots to create' })
+
+    const times = getSlotsForDate(date)
+    if (times.length === 0)
+      return res.status(400).json({ error: 'No slots generated — check opening hours config' })
+
     const rows = times.map((t) => ({ slotDate: date, slotTime: t, isAvailable: true }))
     await db.insert(timeSlots).values(rows).onConflictDoNothing()
-    return res.json({ created: rows.length })
+    return res.json({ created: rows.length, times })
   }
 
   // PATCH — toggle slot availability { id, isAvailable }

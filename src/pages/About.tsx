@@ -2,7 +2,7 @@ import { Layout } from "@/components/site/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Flower2, Heart, Sparkles, ShieldCheck, Clock, Award, Calendar } from "lucide-react";
-import interior from "@/assets/spa-interior.jpg";
+import interior from "@/assets/3.png";
 
 const About = () => (
   <Layout>

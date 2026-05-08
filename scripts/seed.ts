@@ -21,58 +21,61 @@ const seedData = [
   {
     name: 'Traditional Afro Massage',
     slug: 'traditional-afro-massage',
-    description: 'Classic full-body relaxation with African-inspired smooth, flowing strokes.',
+    description: 'Classic full-body relaxation with authentic African smooth, flowing strokes.',
     prices: [
       { durationMin: 30, priceEur: '25.00' },
-      { durationMin: 60, priceEur: '45.00' },
-      { durationMin: 90, priceEur: '60.00' },
+      { durationMin: 60, priceEur: '40.00' },
+      { durationMin: 90, priceEur: '58.00' },
     ],
   },
   {
-    name: 'Afro Aroma Oil Massage',
-    slug: 'afro-aroma-oil-massage',
+    name: 'Aroma Oil Massage',
+    slug: 'aroma-oil-massage',
     description: 'Warm essential oils with African botanicals for deep calm and skin nourishment.',
     prices: [
       { durationMin: 30, priceEur: '30.00' },
-      { durationMin: 60, priceEur: '50.00' },
-      { durationMin: 90, priceEur: '70.00' },
+      { durationMin: 60, priceEur: '49.00' },
+      { durationMin: 90, priceEur: '69.00' },
     ],
   },
   {
-    name: 'Afro Deep Tissue Massage',
-    slug: 'afro-deep-tissue-massage',
+    name: 'Deep Tissue Massage',
+    slug: 'deep-tissue-massage',
     description: 'Firm, targeted pressure to release tension deep in the muscles.',
     prices: [
-      { durationMin: 30, priceEur: '35.00' },
-      { durationMin: 60, priceEur: '55.00' },
-      { durationMin: 90, priceEur: '75.00' },
+      { durationMin: 30, priceEur: '25.00' },
+      { durationMin: 60, priceEur: '40.00' },
+      { durationMin: 90, priceEur: '58.00' },
     ],
   },
   {
-    name: 'Afro Hot Stone Massage',
-    slug: 'afro-hot-stone-massage',
-    description: 'Warm basalt stones melt away stress and stiffness in harmony with the body.',
-    prices: [
-      { durationMin: 60, priceEur: '60.00' },
-      { durationMin: 90, priceEur: '80.00' },
-    ],
-  },
-  {
-    name: 'Afro Foot Massage',
-    slug: 'afro-foot-massage',
-    description: 'Reflexology-inspired pressure to restore energy to tired feet.',
+    name: 'Hot Stone Massage',
+    slug: 'hot-stone-massage',
+    description: 'Smooth heated basalt stones melt away stiffness and promote deep relaxation.',
     prices: [
       { durationMin: 30, priceEur: '25.00' },
       { durationMin: 60, priceEur: '40.00' },
+      { durationMin: 90, priceEur: '58.00' },
     ],
   },
   {
-    name: 'Afro Head & Face Massage',
-    slug: 'afro-head-face-massage',
-    description: 'Soothing Afro techniques to release tension in the head, scalp, and face.',
+    name: 'Foot Reflexology',
+    slug: 'foot-reflexology',
+    description: 'Targeted pressure on reflex points of the feet to relieve stress and restore balance.',
     prices: [
       { durationMin: 30, priceEur: '25.00' },
       { durationMin: 60, priceEur: '40.00' },
+      { durationMin: 90, priceEur: '58.00' },
+    ],
+  },
+  {
+    name: 'Head & Shoulder Massage',
+    slug: 'head-shoulder-massage',
+    description: 'Focused relief for neck, shoulder, and scalp tension.',
+    prices: [
+      { durationMin: 30, priceEur: '25.00' },
+      { durationMin: 60, priceEur: '40.00' },
+      { durationMin: 90, priceEur: '58.00' },
     ],
   },
 ]
@@ -87,25 +90,34 @@ async function seed() {
       .where(eq(schema.services.slug, s.slug))
       .limit(1)
 
+    let serviceId: string
+
     if (existing.length > 0) {
-      console.log(`  ↳ ${s.name} already exists, skipping`)
-      continue
+      serviceId = existing[0].id
+      // Update name/description in case they changed
+      await db.update(schema.services)
+        .set({ name: s.name, description: s.description })
+        .where(eq(schema.services.slug, s.slug))
+      console.log(`  ↻ ${s.name} — updated`)
+    } else {
+      const [svc] = await db
+        .insert(schema.services)
+        .values({ name: s.name, slug: s.slug, description: s.description, isActive: true })
+        .returning({ id: schema.services.id })
+      serviceId = svc.id
+      console.log(`  ✓ ${s.name} — created`)
     }
 
-    const [svc] = await db
-      .insert(schema.services)
-      .values({ name: s.name, slug: s.slug, description: s.description, isActive: true })
-      .returning({ id: schema.services.id })
-
+    // Upsert prices: delete existing then re-insert (simpler than per-row upsert)
+    await db.delete(schema.servicePrices)
+      .where(eq(schema.servicePrices.serviceId, serviceId))
     for (const p of s.prices) {
       await db.insert(schema.servicePrices).values({
-        serviceId: svc.id,
+        serviceId,
         durationMin: p.durationMin,
         priceEur: p.priceEur,
       })
     }
-
-    console.log(`  ✓ ${s.name} (${s.prices.length} price tiers)`)
   }
 
   console.log('\n✅ Seeding complete!')

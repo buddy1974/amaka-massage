@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { isOpenDay } from '@/lib/openingHours'
 
 interface Props {
   onSelect: (date: string) => void
@@ -60,7 +61,8 @@ export const DatePicker = ({ onSelect }: Props) => {
 
   const handleDayClick = (day: number) => {
     const dateStr = `${year}-${pad(month)}-${pad(day)}`
-    if (dateStr < todayStr || !availableDates.has(dateStr)) return
+    const dow = new Date(dateStr + 'T00:00:00').getDay()
+    if (dateStr < todayStr || !isOpenDay(dow) || !availableDates.has(dateStr)) return
     setSelected(dateStr)
   }
 
@@ -97,10 +99,12 @@ export const DatePicker = ({ onSelect }: Props) => {
         {cells.map((day, idx) => {
           if (day === null) return <div key={`e-${idx}`} />
           const dateStr = `${year}-${pad(month)}-${pad(day)}`
+          const dow = new Date(dateStr + 'T00:00:00').getDay()
           const isPast = dateStr < todayStr
+          const isClosed = !isOpenDay(dow)
           const hasSlots = availableDates.has(dateStr)
           const isSelected = selected === dateStr
-          const isDisabled = isPast || !hasSlots
+          const isDisabled = isPast || isClosed || !hasSlots
 
           return (
             <button
@@ -108,14 +112,21 @@ export const DatePicker = ({ onSelect }: Props) => {
               type="button"
               onClick={() => handleDayClick(day)}
               disabled={isDisabled}
+              title={isClosed ? 'Closed' : undefined}
               className={`
-                aspect-square rounded-lg text-sm font-medium transition-colors
+                aspect-square rounded-lg text-sm font-medium transition-colors relative
                 ${isSelected ? 'bg-primary text-primary-foreground' : ''}
                 ${!isSelected && !isDisabled ? 'hover:bg-secondary cursor-pointer text-foreground' : ''}
-                ${isDisabled ? 'text-muted-foreground/30 cursor-not-allowed' : ''}
+                ${isClosed ? 'text-muted-foreground/20 cursor-not-allowed' : ''}
+                ${!isClosed && isDisabled ? 'text-muted-foreground/30 cursor-not-allowed' : ''}
               `}
             >
               {day}
+              {isClosed && !isPast && (
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[7px] text-muted-foreground/40 leading-none">
+                  closed
+                </span>
+              )}
             </button>
           )
         })}

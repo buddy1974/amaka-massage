@@ -14,13 +14,13 @@ const links = [
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
   return (
-    <header className="gradient-purple text-primary-foreground sticky top-0 z-50 shadow-soft">
-      <div className="container flex items-center justify-between py-3">
-        <Link to="/" className="flex items-center">
+    <header className="bg-[#0d0020] text-primary-foreground sticky top-0 z-50 shadow-soft">
+      <div className="container flex items-center justify-between py-2">
+        <Link to="/" className="flex items-center bg-white rounded-xl px-3 py-1.5">
           <img
             src="/logo.png"
             alt="Amaka Massage"
-            className="h-14 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
         </Link>
         <nav className="hidden lg:flex items-center gap-8">
@@ -56,7 +56,7 @@ export const Navbar = () => {
         </button>
       </div>
       {open && (
-        <div className="lg:hidden border-t border-primary-foreground/10 px-4 pb-4">
+        <div className="lg:hidden border-t border-white/10 px-4 pb-4">
           <nav className="flex flex-col gap-3 pt-3">
             {links.map((l) => (
               <NavLink key={l.to} to={l.to} end={l.to === "/"} onClick={() => setOpen(false)}
