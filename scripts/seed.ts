@@ -2,7 +2,7 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { readFileSync, existsSync } from 'fs'
 import * as schema from '../drizzle/schema'
-import { eq } from 'drizzle-orm'
+import { eq, notInArray } from 'drizzle-orm'
 
 // Load .env.local for local runs
 for (const f of ['.env.local', '.env']) {
@@ -80,9 +80,23 @@ const seedData = [
   },
 ]
 
+const ACTIVE_SLUGS = seedData.map(s => s.slug)
+
 async function seed() {
   console.log('🌱 Seeding database...\n')
 
+  // Step 1: deactivate any legacy services not in the current slug list
+  const deactivated = await db
+    .update(schema.services)
+    .set({ isActive: false })
+    .where(notInArray(schema.services.slug, ACTIVE_SLUGS))
+    .returning({ slug: schema.services.slug })
+
+  if (deactivated.length > 0) {
+    console.log(`  🗑  Deactivated ${deactivated.length} legacy service(s): ${deactivated.map(d => d.slug).join(', ')}\n`)
+  }
+
+  // Step 2: upsert current services
   for (const s of seedData) {
     const existing = await db
       .select({ id: schema.services.id })
@@ -94,9 +108,8 @@ async function seed() {
 
     if (existing.length > 0) {
       serviceId = existing[0].id
-      // Update name/description in case they changed
       await db.update(schema.services)
-        .set({ name: s.name, description: s.description })
+        .set({ name: s.name, description: s.description, isActive: true })
         .where(eq(schema.services.slug, s.slug))
       console.log(`  ↻ ${s.name} — updated`)
     } else {
@@ -108,7 +121,7 @@ async function seed() {
       console.log(`  ✓ ${s.name} — created`)
     }
 
-    // Upsert prices: delete existing then re-insert (simpler than per-row upsert)
+    // Refresh prices: delete existing then re-insert
     await db.delete(schema.servicePrices)
       .where(eq(schema.servicePrices.serviceId, serviceId))
     for (const p of s.prices) {
