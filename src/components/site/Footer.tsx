@@ -23,14 +23,19 @@ export const Footer = () => (
       </div>
       <div>
         <h4 className="font-serif text-lg mb-3 text-accent">Contact</h4>
-        <a href="tel:015906306248" className="text-sm opacity-90 flex gap-2 hover:text-accent">
-          <Phone className="h-4 w-4 mt-0.5" />0159 06306248
+        <a href="tel:015906306248" className="text-sm opacity-90 flex gap-2 hover:text-accent mb-1">
+          <Phone className="h-4 w-4 mt-0.5 shrink-0" />0159 06306248
+        </a>
+        <a href="tel:020174921756" className="text-sm opacity-90 flex gap-2 hover:text-accent">
+          <Phone className="h-4 w-4 mt-0.5 shrink-0" />0201 74921756
         </a>
       </div>
       <div>
         <h4 className="font-serif text-lg mb-3 text-accent">Opening Hours</h4>
         <p className="text-sm opacity-90 flex gap-2"><Clock className="h-4 w-4 mt-0.5 shrink-0" />
-          Mon – Fri: 10:00 – 19:00<br />Saturday: 13:00 – 20:00
+          Mon – Tue, Thu – Fri: 10:00 – 19:00<br />
+          Wednesday: 10:00 – 17:00<br />
+          Saturday: 13:00 – 20:00
         </p>
       </div>
     </div>

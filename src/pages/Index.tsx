@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Calendar, Phone, Heart, Sparkles, ShieldCheck, Clock, Flower2 } from "lucide-react";
 import hero from "@/assets/hero-massage.png";
-import interior from "@/assets/spa-interior.jpg";
+import interior from "@/assets/8.png";
 import { services } from "@/data/services";
 
 const Index = () => {
