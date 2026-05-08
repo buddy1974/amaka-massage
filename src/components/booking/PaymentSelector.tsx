@@ -101,12 +101,12 @@ export const PaymentSelector = ({
 
   return (
     <div>
-      <h2 className="font-serif text-2xl text-primary-deep mb-2">Payment Method</h2>
-      <p className="text-muted-foreground text-sm mb-6">Choose how you'd like to pay for your session.</p>
+      <h2 className="font-serif text-2xl text-primary-deep mb-2">Zahlungsart</h2>
+      <p className="text-muted-foreground text-sm mb-6">Wählen Sie Ihre bevorzugte Zahlungsart.</p>
 
       {bookingRef && (
         <p className="text-xs text-muted-foreground mb-6">
-          Booking ref:{' '}
+          Buchungsnummer:{' '}
           <span className="font-mono font-bold text-primary tracking-wide">{bookingRef}</span>
         </p>
       )}
@@ -130,9 +130,9 @@ export const PaymentSelector = ({
             Recommended
           </span>
           <Banknote className="h-8 w-8 mb-3 text-primary" />
-          <div className="font-bold text-primary-deep">Pay on-site</div>
-          <div className="text-sm text-muted-foreground mt-1">Pay when you arrive</div>
-          <div className="text-xl font-bold mt-2 text-primary">Cash or card</div>
+          <div className="font-bold text-primary-deep">Vor Ort zahlen</div>
+          <div className="text-sm text-muted-foreground mt-1">Zahlung beim Besuch</div>
+          <div className="text-xl font-bold mt-2 text-primary">Bar oder Kartenzahlung</div>
           {isLoading && !stripeActive && (
             <Loader2 className="absolute bottom-4 right-4 h-4 w-4 text-primary animate-spin" />
           )}
@@ -159,7 +159,7 @@ export const PaymentSelector = ({
           <div className={`font-semibold ${stripeActive ? 'text-primary-deep' : 'text-foreground'}`}>
             Pay by card
           </div>
-          <div className="text-sm text-muted-foreground mt-1">Secure online payment</div>
+          <div className="text-sm text-muted-foreground mt-1">Sichere Online-Zahlung</div>
           <div className={`text-xl font-bold mt-2 ${stripeActive ? 'text-primary' : 'text-foreground/70'}`}>
             €{amount.toFixed(2)}
           </div>

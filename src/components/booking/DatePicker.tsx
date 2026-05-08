@@ -7,10 +7,10 @@ interface Props {
   onSelect: (date: string) => void
 }
 
-const DAY_HEADERS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const DAY_HEADERS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 const MONTH_NAMES = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
+  'Januar','Februar','März','April','Mai','Juni',
+  'Juli','August','September','Oktober','November','Dezember',
 ]
 
 function pad(n: number) { return String(n).padStart(2, '0') }
@@ -70,7 +70,7 @@ export const DatePicker = ({ onSelect }: Props) => {
 
   return (
     <div>
-      <h2 className="font-serif text-2xl text-primary-deep mb-6">Choose a Date</h2>
+      <h2 className="font-serif text-2xl text-primary-deep mb-6">Datum wählen</h2>
 
       {/* Month navigation */}
       <div className="flex items-center justify-between mb-4">

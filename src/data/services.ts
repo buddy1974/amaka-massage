@@ -1,9 +1,10 @@
-import img1 from "@/assets/1.png";
-import img2 from "@/assets/2.png";
-import img3 from "@/assets/3.png";
-import img4 from "@/assets/4.png";
-import img5 from "@/assets/5.png";
-import img7 from "@/assets/7.png";
+import img1 from "@/assets/1.webp";
+import img2 from "@/assets/2.webp";
+import img3 from "@/assets/3.webp";
+import img4 from "@/assets/4.webp";
+import img5 from "@/assets/5.webp";
+import img7 from "@/assets/7.webp";
+import img8 from "@/assets/8.webp";
 
 export interface ServicePrice {
   duration: string;
@@ -18,73 +19,137 @@ export interface Service {
   image: string;
   description: string;
   prices: ServicePrice[];
+  featured?: boolean;
 }
 
 export const services: Service[] = [
   {
-    name: "Traditional Afro Massage",
-    slug: "traditional-afro-massage",
+    name: "AFRO ORIGIN – Traditionelle Massage",
+    slug: "afro-origin-traditionelle-massage",
     image: img1,
-    description: "Classic full-body relaxation with authentic African smooth, flowing strokes that melt away tension.",
+    description: "Klassische Ganzkörpermassage mit authentischen afrikanischen Techniken. Druckpunkte und Dehnpositionen stimulieren die Energielinien im Körper.",
+    featured: true,
     prices: [
-      { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
-      { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
-      { duration: "90 min", durationMin: 90, price: "58 €", priceEur: 58 },
+      { duration: "30 Min.", durationMin: 30,  price: "35 €",  priceEur: 35  },
+      { duration: "60 Min.", durationMin: 60,  price: "55 €",  priceEur: 55  },
+      { duration: "90 Min.", durationMin: 90,  price: "80 €",  priceEur: 80  },
+      { duration: "120 Min.", durationMin: 120, price: "105 €", priceEur: 105 },
+      { duration: "150 Min.", durationMin: 150, price: "130 €", priceEur: 130 },
+      { duration: "180 Min.", durationMin: 180, price: "155 €", priceEur: 155 },
     ],
   },
   {
-    name: "Aroma Oil Massage",
-    slug: "aroma-oil-massage",
+    name: "Aromaölmassage",
+    slug: "aromaoelmassage",
     image: img2,
-    description: "Warm essential oils with African botanicals for deep calm, skin nourishment, and total relaxation.",
+    description: "Entspannende Massage mit wärmenden ätherischen Ölen und afrikanischen Botanicals für tiefe Ruhe und Hautpflege.",
+    featured: true,
     prices: [
-      { duration: "30 min", durationMin: 30, price: "30 €", priceEur: 30 },
-      { duration: "60 min", durationMin: 60, price: "49 €", priceEur: 49 },
-      { duration: "90 min", durationMin: 90, price: "69 €", priceEur: 69 },
+      { duration: "30 Min.", durationMin: 30,  price: "35 €",  priceEur: 35  },
+      { duration: "60 Min.", durationMin: 60,  price: "60 €",  priceEur: 60  },
+      { duration: "90 Min.", durationMin: 90,  price: "85 €",  priceEur: 85  },
+      { duration: "120 Min.", durationMin: 120, price: "115 €", priceEur: 115 },
+      { duration: "150 Min.", durationMin: 150, price: "140 €", priceEur: 140 },
+      { duration: "180 Min.", durationMin: 180, price: "165 €", priceEur: 165 },
     ],
   },
   {
-    name: "Deep Tissue Massage",
-    slug: "deep-tissue-massage",
+    name: "Gesichts- und Kopfmassage",
+    slug: "gesichts-kopfmassage",
     image: img3,
-    description: "Firm, targeted pressure to release deep muscle tension and restore flexibility and mobility.",
+    description: "Sanfte Massage von Gesicht und Kopf – befreit von Anspannungen, fördert die Durchblutung und sorgt für Klarheit.",
+    featured: true,
     prices: [
-      { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
-      { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
-      { duration: "90 min", durationMin: 90, price: "58 €", priceEur: 58 },
+      { duration: "30 Min.", durationMin: 30, price: "35 €", priceEur: 35 },
+      { duration: "60 Min.", durationMin: 60, price: "55 €", priceEur: 55 },
     ],
   },
   {
-    name: "Hot Stone Massage",
-    slug: "hot-stone-massage",
+    name: "Nacken- und Rückenmassage",
+    slug: "nacken-rueckenmassage",
     image: img4,
-    description: "Smooth heated basalt stones melt away stiffness and promote deep relaxation and energy flow.",
+    description: "Gezielte Behandlung von Nacken und Rücken – löst Verspannungen und befreit von Alltagsstress.",
+    featured: true,
     prices: [
-      { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
-      { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
-      { duration: "90 min", durationMin: 90, price: "58 €", priceEur: 58 },
+      { duration: "30 Min.", durationMin: 30, price: "35 €", priceEur: 35 },
+      { duration: "60 Min.", durationMin: 60, price: "55 €", priceEur: 55 },
+      { duration: "90 Min.", durationMin: 90, price: "75 €", priceEur: 75 },
     ],
   },
   {
-    name: "Foot Reflexology",
-    slug: "foot-reflexology",
+    name: "Fußmassage",
+    slug: "fussmassage",
     image: img5,
-    description: "Targeted pressure on reflex points of the feet to relieve stress and restore balance across the whole body.",
+    description: "Reflexzonenmassage der Füße – stimuliert Energiepunkte, fördert Durchblutung und bringt den ganzen Körper zur Ruhe.",
+    featured: true,
     prices: [
-      { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
-      { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
-      { duration: "90 min", durationMin: 90, price: "58 €", priceEur: 58 },
+      { duration: "30 Min.", durationMin: 30, price: "35 €", priceEur: 35 },
+      { duration: "60 Min.", durationMin: 60, price: "55 €", priceEur: 55 },
     ],
   },
   {
-    name: "Head & Shoulder Massage",
-    slug: "head-shoulder-massage",
+    name: "Teilkörper-Massage",
+    slug: "teilkoerper-massage",
     image: img7,
-    description: "Focused relief for neck, shoulder, and scalp tension — perfect for desk workers and stress headaches.",
+    description: "Massage von Kopf, Nacken und Beinen – ideal für gezielte Entspannung der am stärksten beanspruchten Körperzonen.",
+    featured: true,
     prices: [
-      { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
-      { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
-      { duration: "90 min", durationMin: 90, price: "58 €", priceEur: 58 },
+      { duration: "30 Min.", durationMin: 30, price: "35 €", priceEur: 35 },
+      { duration: "60 Min.", durationMin: 60, price: "55 €", priceEur: 55 },
+    ],
+  },
+  {
+    name: "Intensiv Massage mit Bio-Ölen",
+    slug: "intensiv-massage",
+    image: img8,
+    description: "Intensive Tiefenmassage mit Bio Sheabutteröl, Bio Kokosöl und Aboniki. Speziell bei Migräne, Stress und körperlicher Belastung.",
+    featured: true,
+    prices: [
+      { duration: "60 Min.",  durationMin: 60,  price: "75 €",  priceEur: 75  },
+      { duration: "90 Min.",  durationMin: 90,  price: "110 €", priceEur: 110 },
+      { duration: "120 Min.", durationMin: 120, price: "145 €", priceEur: 145 },
+    ],
+  },
+  {
+    name: "Kombi 1 – Wellness Paket",
+    slug: "kombi-massage-1",
+    image: img1,
+    description: "Traditionelle Massage 60 Min. + Kopf-Schulter-Nacken-Massage 30 Min. + Fußmassage 30 Min. Gesamtdauer: 2 Std.",
+    prices: [
+      { duration: "2 Std.", durationMin: 120, price: "109 €", priceEur: 109 },
+    ],
+  },
+  {
+    name: "Kombi 2 – Wellness Paket",
+    slug: "kombi-massage-2",
+    image: img2,
+    description: "Wellness-Aroma Öl Massage 60 Min. + Kopf-Gesicht-Massage 30 Min. + Fußmassage 30 Min. Gesamtdauer: 2 Std.",
+    prices: [
+      { duration: "2 Std.", durationMin: 120, price: "109 €", priceEur: 109 },
+    ],
+  },
+  {
+    name: "Kombi 3 – Hot Stone Paket",
+    slug: "kombi-massage-3",
+    image: img4,
+    description: "Hot-Stone Massage 90 Min. + Kopf-Nacken und Fußmassage 30 Min. Gesamtdauer: 2 Std.",
+    prices: [
+      { duration: "2 Std.", durationMin: 120, price: "119 €", priceEur: 119 },
+    ],
+  },
+  {
+    name: "Physical Chat-Room",
+    slug: "physical-chat-room",
+    image: img3,
+    description: "Brauchen Sie jemanden zum Reden? Ein sicherer, angenehmer Ort zum Entspannen und Abschalten. Wir haben stets ein offenes Ohr für Sie.",
+    prices: [
+      { duration: "60 Min.",  durationMin: 60,  price: "75 €",  priceEur: 75  },
+      { duration: "90 Min.",  durationMin: 90,  price: "100 €", priceEur: 100 },
+      { duration: "120 Min.", durationMin: 120, price: "140 €", priceEur: 140 },
+      { duration: "150 Min.", durationMin: 150, price: "180 €", priceEur: 180 },
+      { duration: "180 Min.", durationMin: 180, price: "215 €", priceEur: 215 },
     ],
   },
 ];
+
+export const featuredServices = services.filter(s => s.featured);

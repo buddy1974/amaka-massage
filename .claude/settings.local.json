@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\loneb\\\\Documents\\\\ai-software-dev\\\\projects\\\\amaka-massage\" -Recurse -Name)"
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\loneb\\\\Documents\\\\ai-software-dev\\\\projects\\\\amaka-massage\" -Recurse -Name)",
+      "PowerShell(Set-Content *)"
     ]
   }
 }

@@ -1,56 +1,59 @@
-import { MapPin, Phone, Clock } from "lucide-react";
+import { MapPin, Phone, Clock, CreditCard } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const PHONE   = "015213928938";
-const PHONE_D = "01521 3928938";
-const PHONE2  = "020174921756";
-const PHONE2_D = "0201 74921756";
 
 export const Footer = () => (
   <footer className="gradient-purple text-primary-foreground mt-20">
     <div className="container py-14 grid md:grid-cols-4 gap-10">
       <div>
-        <Link to="/" className="flex items-center gap-3 mb-4">
-          <img src="/logo.png" alt="Amaka Massage"
-            className="h-16 w-auto object-contain brightness-0 invert" />
+        <Link to="/">
+          <img src="/logo.png" alt="Amaka's City" className="h-16 w-auto object-contain brightness-0 invert mb-3" />
         </Link>
-        <p className="text-sm opacity-80 leading-relaxed">
-          Relax. Recharge. Feel Better.
-        </p>
+        <p className="text-sm opacity-80 leading-relaxed font-semibold">AMAKA'S CITY</p>
+        <p className="text-xs opacity-60 leading-relaxed mt-1">Traditionelle Massage und Wellness Spa Salon</p>
+        <div className="flex items-center gap-1.5 mt-3 text-xs opacity-70">
+          <CreditCard className="h-3.5 w-3.5 shrink-0" />
+          <span>Kartenzahlung akzeptiert</span>
+        </div>
       </div>
       <div>
-        <h4 className="font-serif text-lg mb-3 text-accent">Address</h4>
+        <h4 className="font-serif text-lg mb-3 text-accent">Adresse</h4>
         <p className="text-sm opacity-90 flex gap-2">
           <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-          <span>Bochumer Landstraße 154<br />45276 Essen</span>
+          <span>Bochumer Landstr. 154<br />45276 Essen<br /><span className="text-xs opacity-70">2 Gehmin. vom Essen Steele Ostbahnhof</span></span>
         </p>
       </div>
       <div>
-        <h4 className="font-serif text-lg mb-3 text-accent">Contact</h4>
-        <a href={`tel:${PHONE}`}
-          className="text-sm opacity-90 flex gap-2 hover:text-accent mb-1">
-          <Phone className="h-4 w-4 mt-0.5 shrink-0" />{PHONE_D}
+        <h4 className="font-serif text-lg mb-3 text-accent">Kontakt</h4>
+        <a href="tel:015906306248" className="text-sm opacity-90 flex gap-2 hover:text-accent mb-1">
+          <Phone className="h-4 w-4 mt-0.5 shrink-0" />0159 06306248
         </a>
-        <a href={`tel:${PHONE2}`}
-          className="text-sm opacity-90 flex gap-2 hover:text-accent">
-          <Phone className="h-4 w-4 mt-0.5 shrink-0" />{PHONE2_D}
+        <a href="tel:020174921756" className="text-sm opacity-90 flex gap-2 hover:text-accent mb-1">
+          <Phone className="h-4 w-4 mt-0.5 shrink-0" />0201 74921756
+        </a>
+        <a href="https://wa.me/4915213928938" target="_blank" rel="noreferrer"
+          className="text-xs opacity-60 hover:opacity-90 flex gap-2 mt-1">
+          <span>WhatsApp: 01521 3928938</span>
         </a>
       </div>
       <div>
-        <h4 className="font-serif text-lg mb-3 text-accent">Opening Hours</h4>
+        <h4 className="font-serif text-lg mb-3 text-accent">Öffnungszeiten</h4>
         <p className="text-sm opacity-90 flex gap-2">
           <Clock className="h-4 w-4 mt-0.5 shrink-0" />
           <span>
-            Mon – Fri: 10:00 – 19:00<br />
-            Saturday: 13:00 – 20:00<br />
-            Sunday: Closed
+            Mo. – Di., Do. – Fr.: 10:00 – 19:00<br />
+            Mi.: 10:00 – 17:00<br />
+            Sa.: 13:00 – 20:00<br />
+            So.: Geschlossen
           </span>
         </p>
       </div>
     </div>
+    <div className="border-t border-primary-foreground/10 container py-4">
+      <p className="text-xs text-center opacity-50">Hinweis: Unsere Massagen verstehen sich als Wellnessbehandlung. Keine Diagnosen oder Heilbehandlungen. Keine Erotikmassage.</p>
+    </div>
     <div className="border-t border-primary-foreground/10">
-      <div className="container py-6 text-xs text-center opacity-60 space-y-1">
-        <p>© {new Date().getFullYear()} Amaka Massage – Essen. All rights reserved.</p>
+      <div className="container py-5 text-xs text-center opacity-60 space-y-1">
+        <p>© {new Date().getFullYear()} AMAKA'S CITY – Essen. Alle Rechte vorbehalten.</p>
         <p>Developed by <a href="https://maxpromo.digital" target="_blank" rel="noreferrer"
           className="hover:opacity-100 underline underline-offset-2">maxpromo.digital</a></p>
       </div>

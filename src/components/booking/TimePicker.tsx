@@ -27,11 +27,11 @@ export const TimePicker = ({ date, onSelect }: Props) => {
     <div>
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h2 className="font-serif text-2xl text-primary-deep">
-          Available times for {formatDate(date)}
+          Verfügbare Zeiten für {formatDate(date)}
         </h2>
         {loading && (
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Loader2 className="h-3 w-3 animate-spin" /> Refreshing…
+            <Loader2 className="h-3 w-3 animate-spin" /> Wird aktualisiert…
           </span>
         )}
       </div>
@@ -46,7 +46,7 @@ export const TimePicker = ({ date, onSelect }: Props) => {
           <AlertCircle className="h-4 w-4 shrink-0" />
           {almostFull
             ? `Only ${available.length} slot${available.length === 1 ? '' : 's'} left — book now to secure your time.`
-            : 'Limited slots available today — book early to avoid disappointment.'}
+            : 'Begrenzte Plätze heute – frühzeitig buchen empfohlen.'}
         </div>
       )}
 
@@ -58,7 +58,7 @@ export const TimePicker = ({ date, onSelect }: Props) => {
 
       {!loading && slots.length === 0 && (
         <p className="text-muted-foreground text-sm py-4">
-          No slots available for this date. Please go back and choose another day.
+          Keine Termine für dieses Datum verfügbar. Bitte einen anderen Tag wählen.
         </p>
       )}
 

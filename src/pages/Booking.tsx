@@ -11,7 +11,7 @@ import { CustomerForm } from '@/components/booking/CustomerForm'
 import { PaymentSelector } from '@/components/booking/PaymentSelector'
 import { ConfirmScreen } from '@/components/booking/ConfirmScreen'
 
-const STEP_LABELS = ['Service', 'Date', 'Time', 'Your Details', 'Payment']
+const STEP_LABELS = ['Service', 'Datum', 'Uhrzeit', 'Ihre Daten', 'Zahlung']
 
 const StepIndicator = ({ current }: { current: number }) => (
   <div className="flex items-center justify-center mb-10">
@@ -58,8 +58,8 @@ const Booking = () => {
       <section className="gradient-hero py-10">
         <div className="container text-center">
           <Flower2 className="h-6 w-6 text-primary mx-auto mb-2" />
-          <h1 className="font-serif text-4xl text-primary-deep">Book Your Session</h1>
-          <p className="font-script text-xl text-primary mt-1">Premium Afro Massage by Amaka</p>
+          <h1 className="font-serif text-4xl text-primary-deep">Termin buchen</h1>
+          <p className="font-script text-xl text-primary mt-1">AMAKA'S CITY – Wellness Spa Essen</p>
         </div>
       </section>
 
@@ -73,7 +73,7 @@ const Booking = () => {
             onClick={booking.back}
             className="text-muted-foreground mb-6 -ml-2 hover:text-primary"
           >
-            <ChevronLeft className="h-4 w-4 mr-1" /> Back
+            <ChevronLeft className="h-4 w-4 mr-1" /> Zurück
           </Button>
         )}
 

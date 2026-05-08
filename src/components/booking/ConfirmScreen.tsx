@@ -21,7 +21,7 @@ function formatDate(dateStr: string): string {
 export const ConfirmScreen = ({ bookingRef, serviceName, date, time, paymentMethod }: Props) => {
   const navigate = useNavigate()
   const appUrl   = (import.meta.env.VITE_APP_URL as string) || 'https://amaka-massage.de'
-  const payLabel = paymentMethod === 'on_site' ? 'Pay on-site (cash or card)' : 'Card payment (Stripe)'
+  const payLabel = paymentMethod === 'on_site' ? 'Vor Ort zahlen (Bar oder Karte)' : 'Kartenzahlung (Online)'
 
   return (
     <div className="text-center max-w-sm mx-auto py-6">
@@ -33,19 +33,19 @@ export const ConfirmScreen = ({ bookingRef, serviceName, date, time, paymentMeth
         </div>
       </div>
 
-      <h2 className="font-serif text-3xl text-primary-deep">Booking Confirmed!</h2>
+      <h2 className="font-serif text-3xl text-primary-deep">Buchung bestätigt!</h2>
       <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-        We will confirm your booking shortly.<br />
-        You may receive a confirmation message.
+        Wir bestätigen Ihre Buchung in Kürze.<br />
+        Sie erhalten gegebenenfalls eine Bestätigungsnachricht.
       </p>
 
       {/* Summary card */}
       <div className="bg-card rounded-2xl shadow-card p-5 mt-6 text-left space-y-3 text-sm">
         {[
-          { label: 'Service',  value: serviceName       },
-          { label: 'Date',     value: formatDate(date)  },
-          { label: 'Time',     value: time.slice(0, 5)  },
-          { label: 'Payment',  value: payLabel          },
+          { label: 'Massage',  value: serviceName       },
+          { label: 'Datum',     value: formatDate(date)  },
+          { label: 'Uhrzeit',     value: time.slice(0, 5)  },
+          { label: 'Zahlung',  value: payLabel          },
         ].map(row => (
           <div key={row.label} className="flex justify-between gap-4 py-1 border-b border-border/50 last:border-0">
             <span className="text-muted-foreground shrink-0">{row.label}</span>
@@ -56,16 +56,16 @@ export const ConfirmScreen = ({ bookingRef, serviceName, date, time, paymentMeth
 
       {/* Booking reference */}
       <div className="mt-6 bg-primary/5 rounded-2xl p-5">
-        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Booking Reference</p>
+        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Buchungsnummer</p>
         <p className="font-mono text-3xl font-bold text-primary tracking-widest">{bookingRef}</p>
-        <p className="text-xs text-muted-foreground mt-2">Keep this reference for your records.</p>
+        <p className="text-xs text-muted-foreground mt-2">Bitte notieren Sie diese Nummer.</p>
       </div>
 
       {/* QR */}
       <div className="flex justify-center mt-6">
         <BookingQR url={`${appUrl}/booking`} size={130} />
       </div>
-      <p className="text-xs text-muted-foreground mt-2">Scan to book again</p>
+      <p className="text-xs text-muted-foreground mt-2">Scannen für erneute Buchung</p>
 
       {/* Actions */}
       <div className="flex gap-3 justify-center mt-8 flex-wrap">

@@ -19,10 +19,10 @@ export const CustomerForm = ({ initialName = '', initialPhone = '', onSubmit }: 
   const validate = (): boolean => {
     const e: { name?: string; phone?: string } = {}
     if (!name.trim() || name.trim().length < 2) {
-      e.name = 'Please enter your full name (at least 2 characters).'
+      e.name = 'Bitte vollständigen Namen eingeben (mind. 2 Zeichen).'
     }
     if (!phone.trim() || !PHONE_REGEX.test(phone.trim())) {
-      e.phone = 'Please enter a valid German phone number (e.g. +49 176 1234 5678 or 0159 06306248).'
+      e.phone = 'Bitte eine gültige Telefonnummer eingeben (z. B. 0159 06306248).'
     }
     setErrors(e)
     return Object.keys(e).length === 0
@@ -35,7 +35,7 @@ export const CustomerForm = ({ initialName = '', initialPhone = '', onSubmit }: 
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <h2 className="font-serif text-2xl text-primary-deep mb-6">Your Details</h2>
+      <h2 className="font-serif text-2xl text-primary-deep mb-6">Ihre Daten</h2>
       <div className="space-y-5 max-w-md">
         <div className="space-y-1.5">
           <Label htmlFor="cust-name">Full Name</Label>

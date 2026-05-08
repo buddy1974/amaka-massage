@@ -101,9 +101,9 @@ export const ServicePicker = ({ onSelect, preselect }: Props) => {
   if (apiError) {
     return (
       <div>
-        <h2 className="font-serif text-2xl text-primary-deep mb-2">Choose Your Service</h2>
+        <h2 className="font-serif text-2xl text-primary-deep mb-2">Massage wählen</h2>
         <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 text-sm text-amber-800 flex flex-wrap items-center gap-3">
-          <span>Online booking is temporarily unavailable — please call or WhatsApp to book:</span>
+          <span>Online-Buchung vorübergehend nicht verfügbar – bitte rufen Sie uns an oder schreiben Sie per WhatsApp:</span>
           <div className="flex gap-2 shrink-0">
             <a href={`tel:${PHONE}`}>
               <Button size="sm" className="gradient-purple text-primary-foreground">
@@ -143,7 +143,7 @@ export const ServicePicker = ({ onSelect, preselect }: Props) => {
   // ── Normal flow ────────────────────────────────────────────────────────
   return (
     <div>
-      <h2 className="font-serif text-2xl text-primary-deep mb-6">Choose Your Service</h2>
+      <h2 className="font-serif text-2xl text-primary-deep mb-6">Massage wählen</h2>
       <div className="grid md:grid-cols-2 gap-4">
         {apiServices.map(svc => {
           const img        = imageMap[svc.slug]
