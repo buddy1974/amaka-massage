@@ -84,8 +84,9 @@ const Index = () => (
         </div>
         <div className="grid md:grid-cols-2 gap-5">
           {services.map((s) => (
-            <article
+            <Link
               key={s.slug}
+              to={`/booking?service=${s.slug}`}
               className="group flex bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300"
             >
               <div className="w-36 md:w-44 shrink-0 overflow-hidden">
@@ -103,14 +104,12 @@ const Index = () => (
                 </div>
                 <div className="flex items-center justify-between mt-4">
                   <span className="text-primary font-bold text-lg">from {s.prices[0].price}</span>
-                  <Link to="/booking">
-                    <Button size="sm" className="gradient-purple text-white hover:opacity-90">
-                      Book
-                    </Button>
-                  </Link>
+                  <span className="gradient-purple text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
+                    Book
+                  </span>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
         <div className="text-center mt-10">

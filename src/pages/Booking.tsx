@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Layout } from '@/components/site/Layout'
 import { Button } from '@/components/ui/button'
 import { Flower2, ChevronLeft } from 'lucide-react'
@@ -15,20 +17,17 @@ const StepIndicator = ({ current }: { current: number }) => (
   <div className="flex items-center justify-center mb-10">
     {STEP_LABELS.map((label, i) => {
       const n = i + 1
-      const done = n < current
+      const done   = n < current
       const active = n === current
       return (
         <div key={label} className="flex items-center">
           <div className="flex flex-col items-center gap-1">
-            <div
-              className={`
-                w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                transition-all
-                ${done   ? 'bg-primary text-primary-foreground' : ''}
-                ${active ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' : ''}
-                ${!done && !active ? 'bg-muted text-muted-foreground' : ''}
-              `}
-            >
+            <div className={`
+              w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all
+              ${done   ? 'bg-primary text-primary-foreground' : ''}
+              ${active ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' : ''}
+              ${!done && !active ? 'bg-muted text-muted-foreground' : ''}
+            `}>
               {done ? '✓' : n}
             </div>
             <span className={`text-[10px] hidden sm:block leading-none ${active ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
@@ -46,8 +45,12 @@ const StepIndicator = ({ current }: { current: number }) => (
 
 const Booking = () => {
   const booking = useBooking()
+  const [searchParams] = useSearchParams()
+  const preselect = searchParams.get('service') ?? undefined   // slug from ?service=<slug>
 
-  // Once a booking exists the slot is locked — prevent going back
+  // If a service slug is in the URL but we're still on step 1 with nothing selected yet,
+  // let ServicePicker handle the auto-selection via its `preselect` prop.
+  // Reset the param once we've advanced past step 1 (no-op — URL params are read-only here).
   const canGoBack = booking.step > 1 && booking.step < 6 && !booking.bookingResult
 
   return (
@@ -68,7 +71,7 @@ const Booking = () => {
             variant="ghost"
             size="sm"
             onClick={booking.back}
-            className="text-muted-foreground mb-6 -ml-2"
+            className="text-muted-foreground mb-6 -ml-2 hover:text-primary"
           >
             <ChevronLeft className="h-4 w-4 mr-1" /> Back
           </Button>
@@ -82,6 +85,7 @@ const Booking = () => {
 
         {booking.step === 1 && (
           <ServicePicker
+            preselect={preselect}
             onSelect={(service, price) => {
               booking.setSelectedService(service)
               booking.setSelectedPrice(price)
@@ -121,11 +125,6 @@ const Booking = () => {
           />
         )}
 
-        {/* Step 5 — PaymentSelector owns the full payment flow:
-            - on_site: calls onSelect → submit creates booking → step 6
-            - stripe:  calls onSelect → submit creates booking → bookingId prop arrives
-                       → PaymentSelector fetches client_secret → shows Stripe Elements inline
-                       → confirmPayment redirects to /booking/success                    */}
         {booking.step === 5 && booking.selectedPrice && (
           <PaymentSelector
             amount={booking.selectedPrice.priceEur}

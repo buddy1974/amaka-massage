@@ -1,17 +1,16 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { CreditCard, Banknote, Loader2, Lock } from 'lucide-react'
+import { CreditCard, Banknote, Loader2, Lock, CheckCircle2 } from 'lucide-react'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { stripePromise } from '@/lib/stripe'
 
-// Rendered inside <Elements> once clientSecret is available
 interface StripeFormProps {
   amount: number
   onError: (msg: string) => void
 }
 
 const StripeInnerForm = ({ amount, onError }: StripeFormProps) => {
-  const stripe = useStripe()
+  const stripe   = useStripe()
   const elements = useElements()
   const [loading, setLoading] = useState(false)
 
@@ -19,15 +18,12 @@ const StripeInnerForm = ({ amount, onError }: StripeFormProps) => {
     e.preventDefault()
     if (!stripe || !elements) return
     setLoading(true)
-
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: `${import.meta.env.VITE_APP_URL}/booking/success`,
       },
     })
-
-    // Only reaches here if redirect didn't happen (error case)
     if (error) {
       onError(error.message ?? 'Payment failed. Please try again.')
       setLoading(false)
@@ -53,31 +49,29 @@ const StripeInnerForm = ({ amount, onError }: StripeFormProps) => {
 
 interface Props {
   amount: number
-  bookingId: string    // empty until parent creates the booking on stripe click
-  bookingRef: string   // for display
+  bookingId: string
+  bookingRef: string
   onSelect: (method: 'stripe' | 'on_site') => void
-  submitting?: boolean // true while parent is creating the booking
+  submitting?: boolean
 }
 
 export const PaymentSelector = ({
   amount, bookingId, bookingRef, onSelect, submitting = false,
 }: Props) => {
-  const [pendingStripe, setPendingStripe] = useState(false)
-  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [pendingStripe, setPendingStripe]   = useState(false)
+  const [clientSecret, setClientSecret]     = useState<string | null>(null)
   const [fetchingSecret, setFetchingSecret] = useState(false)
-  const [stripeError, setStripeError] = useState<string | null>(null)
+  const [stripeError, setStripeError]       = useState<string | null>(null)
 
   const handleCardClick = () => {
     if (pendingStripe || clientSecret || submitting) return
     setPendingStripe(true)
     setFetchingSecret(true)
-    onSelect('stripe') // parent creates booking; bookingId prop will arrive on next render
+    onSelect('stripe')
   }
 
-  // Once bookingId arrives from the parent (after booking creation), fetch client_secret
   useEffect(() => {
     if (!pendingStripe || !bookingId) return
-
     const fetchSecret = async () => {
       try {
         const res = await fetch('/api/create-payment-intent', {
@@ -99,16 +93,16 @@ export const PaymentSelector = ({
         setFetchingSecret(false)
       }
     }
-
     fetchSecret()
   }, [pendingStripe, bookingId])
 
-  const isLoading = submitting || fetchingSecret
+  const isLoading   = submitting || fetchingSecret
   const stripeActive = pendingStripe || !!clientSecret
 
   return (
     <div>
       <h2 className="font-serif text-2xl text-primary-deep mb-2">Payment Method</h2>
+      <p className="text-muted-foreground text-sm mb-6">Choose how you'd like to pay for your session.</p>
 
       {bookingRef && (
         <p className="text-xs text-muted-foreground mb-6">
@@ -118,7 +112,33 @@ export const PaymentSelector = ({
       )}
 
       <div className="grid sm:grid-cols-2 gap-4 max-w-md">
-        {/* Pay by card */}
+
+        {/* ── Pay on-site (PRIMARY — recommended) ── */}
+        <button
+          type="button"
+          onClick={() => onSelect('on_site')}
+          disabled={isLoading || !!clientSecret}
+          className="
+            rounded-2xl border-2 p-6 text-left transition-all
+            border-primary bg-primary/5 shadow-soft
+            hover:bg-primary/10
+            disabled:opacity-40 disabled:cursor-not-allowed
+            relative
+          "
+        >
+          <span className="absolute -top-2.5 left-4 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
+            Recommended
+          </span>
+          <Banknote className="h-8 w-8 mb-3 text-primary" />
+          <div className="font-bold text-primary-deep">Pay on-site</div>
+          <div className="text-sm text-muted-foreground mt-1">Pay when you arrive</div>
+          <div className="text-xl font-bold mt-2 text-primary">Cash or card</div>
+          {isLoading && !stripeActive && (
+            <Loader2 className="absolute bottom-4 right-4 h-4 w-4 text-primary animate-spin" />
+          )}
+        </button>
+
+        {/* ── Pay by card (secondary) ── */}
         <button
           type="button"
           onClick={handleCardClick}
@@ -144,23 +164,6 @@ export const PaymentSelector = ({
             €{amount.toFixed(2)}
           </div>
         </button>
-
-        {/* Pay on-site */}
-        <button
-          type="button"
-          onClick={() => onSelect('on_site')}
-          disabled={isLoading || !!clientSecret}
-          className={`
-            rounded-2xl border-2 p-6 text-left transition-all
-            border-border bg-card hover:border-primary/40
-            disabled:opacity-40 disabled:cursor-not-allowed
-          `}
-        >
-          <Banknote className="h-8 w-8 mb-3 text-muted-foreground" />
-          <div className="font-semibold text-foreground">Pay on-site</div>
-          <div className="text-sm text-muted-foreground mt-1">Pay when you arrive</div>
-          <div className="text-xl font-bold mt-2 text-foreground/70">Cash or card</div>
-        </button>
       </div>
 
       {stripeError && (
@@ -169,7 +172,6 @@ export const PaymentSelector = ({
         </div>
       )}
 
-      {/* Stripe Elements — rendered inline once clientSecret is ready */}
       {clientSecret && (
         <div className="mt-6 max-w-md">
           <Elements

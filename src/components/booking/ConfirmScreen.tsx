@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 import { BookingQR } from './BookingQR'
@@ -20,26 +20,34 @@ function formatDate(dateStr: string): string {
 
 export const ConfirmScreen = ({ bookingRef, serviceName, date, time, paymentMethod }: Props) => {
   const navigate = useNavigate()
-  const appUrl = (import.meta.env.VITE_APP_URL as string) || 'https://amaka-massage.de'
-  const payLabel = paymentMethod === 'on_site' ? 'Pay on-site' : 'Card payment'
+  const appUrl   = (import.meta.env.VITE_APP_URL as string) || 'https://amaka-massage.de'
+  const payLabel = paymentMethod === 'on_site' ? 'Pay on-site (cash or card)' : 'Card payment (Stripe)'
 
   return (
     <div className="text-center max-w-sm mx-auto py-6">
-      <div className="flex justify-center mb-4">
-        <CheckCircle className="h-16 w-16" style={{ color: 'hsl(var(--slot-available))' }} />
-      </div>
-      <h2 className="font-serif text-3xl text-primary-deep">Booking Confirmed!</h2>
-      <p className="text-muted-foreground mt-2 text-sm">We'll see you soon at Amaka Massage Essen.</p>
 
-      {/* Summary */}
+      {/* Checkmark */}
+      <div className="flex justify-center mb-4">
+        <div className="bg-green-100 rounded-full p-4">
+          <CheckCircle2 className="h-14 w-14 text-green-500" />
+        </div>
+      </div>
+
+      <h2 className="font-serif text-3xl text-primary-deep">Booking Confirmed!</h2>
+      <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+        We will confirm your booking shortly.<br />
+        You may receive a confirmation message.
+      </p>
+
+      {/* Summary card */}
       <div className="bg-card rounded-2xl shadow-card p-5 mt-6 text-left space-y-3 text-sm">
         {[
-          { label: 'Service', value: serviceName },
-          { label: 'Date', value: formatDate(date) },
-          { label: 'Time', value: time.slice(0, 5) },
-          { label: 'Payment', value: payLabel },
+          { label: 'Service',  value: serviceName       },
+          { label: 'Date',     value: formatDate(date)  },
+          { label: 'Time',     value: time.slice(0, 5)  },
+          { label: 'Payment',  value: payLabel          },
         ].map(row => (
-          <div key={row.label} className="flex justify-between gap-4">
+          <div key={row.label} className="flex justify-between gap-4 py-1 border-b border-border/50 last:border-0">
             <span className="text-muted-foreground shrink-0">{row.label}</span>
             <span className="font-medium text-primary-deep text-right">{row.value}</span>
           </div>
@@ -47,14 +55,15 @@ export const ConfirmScreen = ({ bookingRef, serviceName, date, time, paymentMeth
       </div>
 
       {/* Booking reference */}
-      <div className="mt-6">
+      <div className="mt-6 bg-primary/5 rounded-2xl p-5">
         <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Booking Reference</p>
         <p className="font-mono text-3xl font-bold text-primary tracking-widest">{bookingRef}</p>
+        <p className="text-xs text-muted-foreground mt-2">Keep this reference for your records.</p>
       </div>
 
-      {/* QR code */}
+      {/* QR */}
       <div className="flex justify-center mt-6">
-        <BookingQR url={`${appUrl}/booking`} size={140} />
+        <BookingQR url={`${appUrl}/booking`} size={130} />
       </div>
       <p className="text-xs text-muted-foreground mt-2">Scan to book again</p>
 
