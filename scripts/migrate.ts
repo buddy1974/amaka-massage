@@ -14,22 +14,29 @@ for (const f of ['.env.local', '.env']) {
 const sql = neon(process.env.DATABASE_URL!)
 
 async function migrate() {
-  console.log('Running schema migration...')
+  console.log('Running migrations…')
 
-  // 1. Add new columns to bookings
+  // 1. New booking columns
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_date DATE`
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_time TIME`
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS duration_min INTEGER`
-
-  // 2. Make slot_id nullable (it was NOT NULL before)
   await sql`ALTER TABLE bookings ALTER COLUMN slot_id DROP NOT NULL`
+  console.log('✓ bookings: date/time columns added, slot_id nullable')
 
-  console.log('✓ bookings: booking_date, booking_time, duration_min added')
-  console.log('✓ bookings: slot_id is now nullable')
-  console.log('Migration complete!')
+  // 2. Blocked slots table for walk-in / phone bookings
+  await sql`
+    CREATE TABLE IF NOT EXISTS blocked_slots (
+      id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      block_date   DATE NOT NULL,
+      block_time   TIME,
+      duration_min INTEGER DEFAULT 60,
+      note         TEXT,
+      created_at   TIMESTAMP WITH TIME ZONE DEFAULT now()
+    )
+  `
+  console.log('✓ blocked_slots table ready')
+
+  console.log('\nAll migrations complete!')
 }
 
-migrate().catch(err => {
-  console.error('Migration failed:', err)
-  process.exit(1)
-})
+migrate().catch(err => { console.error('Migration failed:', err); process.exit(1) })
