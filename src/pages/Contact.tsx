@@ -6,6 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Flower2, MapPin, Phone, Clock, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
+const PHONE   = "015213928938";
+const PHONE_D = "01521 3928938";
+const PHONE2  = "020174921756";
+const PHONE2_D = "0201 74921756";
+
 const Contact = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +40,12 @@ const Contact = () => {
             <Phone className="h-6 w-6 text-primary shrink-0" />
             <div>
               <h3 className="font-serif text-xl text-primary-deep">Phone / WhatsApp</h3>
-              <a href="tel:015906306248" className="text-primary font-semibold block">0159 06306248</a>
-              <a href="tel:020174921756" className="text-primary font-semibold block mt-0.5">0201 74921756</a>
+              <a href={`tel:${PHONE}`} className="text-primary font-semibold block mt-1">
+                {PHONE_D}
+              </a>
+              <a href={`tel:${PHONE2}`} className="text-primary font-semibold block mt-0.5">
+                {PHONE2_D}
+              </a>
             </div>
           </div>
           <div className="bg-card rounded-2xl p-6 shadow-card flex gap-4">
@@ -44,24 +53,24 @@ const Contact = () => {
             <div>
               <h3 className="font-serif text-xl text-primary-deep">Opening Hours</h3>
               <p className="text-muted-foreground mt-1">
-                Mon – Tue, Thu – Fri: 10:00 – 19:00<br />
-                Wednesday: 10:00 – 17:00<br />
-                Saturday: 13:00 – 20:00
+                Mon – Fri: 10:00 – 19:00<br />
+                Saturday: 13:00 – 20:00<br />
+                Sunday: Closed
               </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <a href="tel:015906306248">
+            <a href={`tel:${PHONE}`}>
               <Button className="gradient-purple text-primary-foreground hover:opacity-90">
-                <Phone className="mr-2 h-4 w-4" /> 0159 06306248
+                <Phone className="mr-2 h-4 w-4" /> {PHONE_D}
               </Button>
             </a>
-            <a href="tel:020174921756">
+            <a href={`tel:${PHONE2}`}>
               <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                <Phone className="mr-2 h-4 w-4" /> 0201 74921756
+                <Phone className="mr-2 h-4 w-4" /> {PHONE2_D}
               </Button>
             </a>
-            <a href="https://wa.me/4915906306248" target="_blank" rel="noreferrer">
+            <a href={`https://wa.me/49${PHONE}`} target="_blank" rel="noreferrer">
               <Button className="bg-green-500 text-white hover:bg-green-600">
                 <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
               </Button>
@@ -76,6 +85,7 @@ const Contact = () => {
             />
           </div>
         </div>
+
         <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-card space-y-4 h-fit">
           <h2 className="font-serif text-2xl text-primary-deep">Send us a message</h2>
           <div>
@@ -92,9 +102,9 @@ const Contact = () => {
           </div>
           <div>
             <Label htmlFor="message">Message</Label>
-            <Textarea id="message" rows={5} required className="mt-1" />
+            <Textarea id="message" required rows={4} className="mt-1" />
           </div>
-          <Button type="submit" className="gradient-purple text-primary-foreground hover:opacity-90 w-full">
+          <Button type="submit" className="w-full gradient-purple text-primary-foreground hover:opacity-90">
             Send Message
           </Button>
         </form>
