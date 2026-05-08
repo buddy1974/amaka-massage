@@ -25,8 +25,7 @@ export const services: Service[] = [
     name: "Traditional Afro Massage",
     slug: "traditional-afro-massage",
     image: img1,
-    description:
-      "Classic full-body relaxation with authentic African smooth, flowing strokes that melt away tension.",
+    description: "Classic full-body relaxation with authentic African smooth, flowing strokes that melt away tension.",
     prices: [
       { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
       { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
@@ -37,8 +36,7 @@ export const services: Service[] = [
     name: "Aroma Oil Massage",
     slug: "aroma-oil-massage",
     image: img2,
-    description:
-      "Warm essential oils with African botanicals for deep calm, skin nourishment, and total relaxation.",
+    description: "Warm essential oils with African botanicals for deep calm, skin nourishment, and total relaxation.",
     prices: [
       { duration: "30 min", durationMin: 30, price: "30 €", priceEur: 30 },
       { duration: "60 min", durationMin: 60, price: "49 €", priceEur: 49 },
@@ -49,8 +47,7 @@ export const services: Service[] = [
     name: "Deep Tissue Massage",
     slug: "deep-tissue-massage",
     image: img3,
-    description:
-      "Firm, targeted pressure to release deep muscle tension and restore flexibility and mobility.",
+    description: "Firm, targeted pressure to release deep muscle tension and restore flexibility and mobility.",
     prices: [
       { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
       { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
@@ -61,8 +58,7 @@ export const services: Service[] = [
     name: "Hot Stone Massage",
     slug: "hot-stone-massage",
     image: img4,
-    description:
-      "Smooth heated basalt stones melt away stiffness and promote deep relaxation and energy flow.",
+    description: "Smooth heated basalt stones melt away stiffness and promote deep relaxation and energy flow.",
     prices: [
       { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
       { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
@@ -73,8 +69,7 @@ export const services: Service[] = [
     name: "Foot Reflexology",
     slug: "foot-reflexology",
     image: img5,
-    description:
-      "Targeted pressure on reflex points of the feet to relieve stress and restore balance across the whole body.",
+    description: "Targeted pressure on reflex points of the feet to relieve stress and restore balance across the whole body.",
     prices: [
       { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
       { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
@@ -85,8 +80,7 @@ export const services: Service[] = [
     name: "Head & Shoulder Massage",
     slug: "head-shoulder-massage",
     image: img7,
-    description:
-      "Focused relief for neck, shoulder, and scalp tension — perfect for desk workers and stress headaches.",
+    description: "Focused relief for neck, shoulder, and scalp tension — perfect for desk workers and stress headaches.",
     prices: [
       { duration: "30 min", durationMin: 30, price: "25 €", priceEur: 25 },
       { duration: "60 min", durationMin: 60, price: "40 €", priceEur: 40 },
