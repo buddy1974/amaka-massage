@@ -17,6 +17,7 @@ export const servicePrices = pgTable('service_prices', {
   priceEur: numeric('price_eur', { precision: 6, scale: 2 }).notNull(),
 })
 
+// timeSlots table kept for admin "blocked days" management
 export const timeSlots = pgTable('time_slots', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   slotDate: date('slot_date').notNull(),
@@ -29,9 +30,14 @@ export const timeSlots = pgTable('time_slots', {
 
 export const bookings = pgTable('bookings', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
-  slotId: uuid('slot_id').notNull().references(() => timeSlots.id),
+  // slotId kept nullable for backward compat — new bookings use bookingDate/bookingTime
+  slotId: uuid('slot_id').references(() => timeSlots.id),
   serviceId: uuid('service_id').notNull().references(() => services.id),
   priceId: uuid('price_id').notNull().references(() => servicePrices.id),
+  // New direct date/time columns (populated by new booking flow)
+  bookingDate: date('booking_date'),
+  bookingTime: time('booking_time'),
+  durationMin: integer('duration_min'),
   customerName: text('customer_name').notNull(),
   customerPhone: text('customer_phone').notNull(),
   paymentMethod: text('payment_method').notNull(),

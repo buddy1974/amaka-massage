@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { jwtVerify } from 'jose'
 import { db } from '../../src/lib/neon'
-import { bookings, timeSlots, services, servicePrices } from '../../drizzle/schema'
+import { bookings, services, servicePrices } from '../../drizzle/schema'
 import { eq, desc } from 'drizzle-orm'
 
 async function verifyAdmin(req: VercelRequest): Promise<boolean> {
@@ -25,32 +25,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!(await verifyAdmin(req))) return res.status(401).json({ error: 'Unauthorized' })
 
-  // GET — list all bookings with joins
+  // GET — list all bookings
   if (req.method === 'GET') {
     const rows = await db
       .select({
-        id: bookings.id,
-        customerName: bookings.customerName,
+        id:            bookings.id,
+        customerName:  bookings.customerName,
         customerPhone: bookings.customerPhone,
         paymentMethod: bookings.paymentMethod,
         paymentStatus: bookings.paymentStatus,
         bookingStatus: bookings.bookingStatus,
-        createdAt: bookings.createdAt,
-        slotDate: timeSlots.slotDate,
-        slotTime: timeSlots.slotTime,
-        serviceName: services.name,
-        durationMin: servicePrices.durationMin,
-        priceEur: servicePrices.priceEur,
+        bookingDate:   bookings.bookingDate,
+        bookingTime:   bookings.bookingTime,
+        durationMin:   bookings.durationMin,
+        createdAt:     bookings.createdAt,
+        serviceName:   services.name,
+        priceEur:      servicePrices.priceEur,
       })
       .from(bookings)
-      .innerJoin(timeSlots, eq(bookings.slotId, timeSlots.id))
-      .innerJoin(services, eq(bookings.serviceId, services.id))
-      .innerJoin(servicePrices, eq(bookings.priceId, servicePrices.id))
+      .innerJoin(services,      eq(bookings.serviceId, services.id))
+      .innerJoin(servicePrices, eq(bookings.priceId,   servicePrices.id))
       .orderBy(desc(bookings.createdAt))
     return res.json(rows)
   }
 
-  // PATCH — update booking status (confirm / cancel)
+  // PATCH — update booking status
   if (req.method === 'PATCH') {
     const { id, bookingStatus } = req.body as { id?: string; bookingStatus?: string }
     if (!id || !bookingStatus) return res.status(400).json({ error: 'id and bookingStatus required' })

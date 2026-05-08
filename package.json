@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "npx tsx scripts/seed.ts"
+    "seed": "npx tsx scripts/seed.ts",
+    "migrate": "npx tsx scripts/migrate.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

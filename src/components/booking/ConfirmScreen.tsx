@@ -1,81 +1,80 @@
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Calendar, Clock, CreditCard, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useNavigate } from 'react-router-dom'
-import { BookingQR } from './BookingQR'
+import { Link } from 'react-router-dom'
 
 interface Props {
-  bookingRef: string
-  serviceName: string
-  date: string
-  time: string
-  paymentMethod: string
+  bookingRef:    string
+  serviceName:   string
+  durationMin:   number
+  date:          string
+  time:          string
+  paymentMethod: 'stripe' | 'on_site'
 }
 
-function formatDate(dateStr: string): string {
-  const [y, m, d] = dateStr.split('-').map(Number)
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-GB', {
+function formatDate(ds: string): string {
+  const [y, m, d] = ds.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('de-DE', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
   })
 }
 
-export const ConfirmScreen = ({ bookingRef, serviceName, date, time, paymentMethod }: Props) => {
-  const navigate = useNavigate()
-  const appUrl   = (import.meta.env.VITE_APP_URL as string) || 'https://amaka-massage.de'
-  const payLabel = paymentMethod === 'on_site' ? 'Vor Ort zahlen (Bar oder Karte)' : 'Kartenzahlung (Online)'
+export const ConfirmScreen = ({ bookingRef, serviceName, durationMin, date, time, paymentMethod }: Props) => (
+  <div className="text-center py-4">
+    <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+    <h2 className="font-serif text-3xl text-primary-deep mb-2">Buchung bestätigt!</h2>
+    <p className="text-muted-foreground mb-8">
+      Wir haben Ihre Anfrage erhalten und melden uns in Kürze zur Bestätigung.
+    </p>
 
-  return (
-    <div className="text-center max-w-sm mx-auto py-6">
-
-      {/* Checkmark */}
-      <div className="flex justify-center mb-4">
-        <div className="bg-green-100 rounded-full p-4">
-          <CheckCircle2 className="h-14 w-14 text-green-500" />
+    <div className="bg-card rounded-2xl border border-border shadow-card p-6 text-left max-w-sm mx-auto mb-8 space-y-4">
+      <div>
+        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Buchungsnummer</p>
+        <p className="font-mono font-bold text-primary text-lg">{bookingRef}</p>
+      </div>
+      <div className="flex items-start gap-3">
+        <CreditCard className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+        <div>
+          <p className="text-xs text-muted-foreground">Massage</p>
+          <p className="font-medium text-foreground">{serviceName} – {durationMin} Min.</p>
         </div>
       </div>
-
-      <h2 className="font-serif text-3xl text-primary-deep">Buchung bestätigt!</h2>
-      <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-        Wir bestätigen Ihre Buchung in Kürze.<br />
-        Sie erhalten gegebenenfalls eine Bestätigungsnachricht.
-      </p>
-
-      {/* Summary card */}
-      <div className="bg-card rounded-2xl shadow-card p-5 mt-6 text-left space-y-3 text-sm">
-        {[
-          { label: 'Massage',  value: serviceName       },
-          { label: 'Datum',     value: formatDate(date)  },
-          { label: 'Uhrzeit',     value: time.slice(0, 5)  },
-          { label: 'Zahlung',  value: payLabel          },
-        ].map(row => (
-          <div key={row.label} className="flex justify-between gap-4 py-1 border-b border-border/50 last:border-0">
-            <span className="text-muted-foreground shrink-0">{row.label}</span>
-            <span className="font-medium text-primary-deep text-right">{row.value}</span>
-          </div>
-        ))}
+      <div className="flex items-start gap-3">
+        <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+        <div>
+          <p className="text-xs text-muted-foreground">Datum</p>
+          <p className="font-medium text-foreground">{formatDate(date)}</p>
+        </div>
       </div>
-
-      {/* Booking reference */}
-      <div className="mt-6 bg-primary/5 rounded-2xl p-5">
-        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Buchungsnummer</p>
-        <p className="font-mono text-3xl font-bold text-primary tracking-widest">{bookingRef}</p>
-        <p className="text-xs text-muted-foreground mt-2">Bitte notieren Sie diese Nummer.</p>
+      <div className="flex items-start gap-3">
+        <Clock className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+        <div>
+          <p className="text-xs text-muted-foreground">Uhrzeit</p>
+          <p className="font-medium text-foreground">{time.slice(0, 5)} Uhr</p>
+        </div>
       </div>
-
-      {/* QR */}
-      <div className="flex justify-center mt-6">
-        <BookingQR url={`${appUrl}/booking`} size={130} />
-      </div>
-      <p className="text-xs text-muted-foreground mt-2">Scannen für erneute Buchung</p>
-
-      {/* Actions */}
-      <div className="flex gap-3 justify-center mt-8 flex-wrap">
-        <Button variant="outline" onClick={() => window.location.reload()}>
-          Book Another
-        </Button>
-        <Button onClick={() => navigate('/')} className="gradient-purple text-primary-foreground">
-          Go Home
-        </Button>
+      <div className="flex items-start gap-3">
+        <Phone className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+        <div>
+          <p className="text-xs text-muted-foreground">Zahlung</p>
+          <p className="font-medium text-foreground">
+            {paymentMethod === 'on_site' ? 'Bar oder Karte vor Ort' : 'Online-Kartenzahlung'}
+          </p>
+        </div>
       </div>
     </div>
-  )
-}
+
+    <p className="text-sm text-muted-foreground mb-6">
+      Bei Fragen: <a href="tel:015906306248" className="text-primary font-medium hover:underline">0159 06306248</a>{' '}
+      oder{' '}
+      <a href="https://wa.me/49015213928938" target="_blank" rel="noreferrer" className="text-primary font-medium hover:underline">
+        WhatsApp
+      </a>
+    </p>
+
+    <Link to="/">
+      <Button className="gradient-purple text-primary-foreground px-8">
+        Zur Startseite
+      </Button>
+    </Link>
+  </div>
+)

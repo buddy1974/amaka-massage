@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Layout } from '@/components/site/Layout'
 import { Button } from '@/components/ui/button'
@@ -16,26 +15,32 @@ const STEP_LABELS = ['Service', 'Datum', 'Uhrzeit', 'Ihre Daten', 'Zahlung']
 const StepIndicator = ({ current }: { current: number }) => (
   <div className="flex items-center justify-center mb-10">
     {STEP_LABELS.map((label, i) => {
-      const n = i + 1
+      const n      = i + 1
       const done   = n < current
       const active = n === current
       return (
         <div key={label} className="flex items-center">
           <div className="flex flex-col items-center gap-1">
-            <div className={`
-              w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all
-              ${done   ? 'bg-primary text-primary-foreground' : ''}
-              ${active ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' : ''}
-              ${!done && !active ? 'bg-muted text-muted-foreground' : ''}
-            `}>
+            <div className={[
+              'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all',
+              done   ? 'bg-primary text-primary-foreground' : '',
+              active ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' : '',
+              !done && !active ? 'bg-muted text-muted-foreground' : '',
+            ].join(' ')}>
               {done ? '✓' : n}
             </div>
-            <span className={`text-[10px] hidden sm:block leading-none ${active ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+            <span className={[
+              'text-[10px] hidden sm:block leading-none',
+              active ? 'text-primary font-medium' : 'text-muted-foreground',
+            ].join(' ')}>
               {label}
             </span>
           </div>
           {i < STEP_LABELS.length - 1 && (
-            <div className={`h-0.5 w-8 sm:w-12 mx-1 mb-4 transition-colors ${n < current ? 'bg-primary' : 'bg-muted'}`} />
+            <div className={[
+              'h-0.5 w-8 sm:w-12 mx-1 mb-4 transition-colors',
+              n < current ? 'bg-primary' : 'bg-muted',
+            ].join(' ')} />
           )}
         </div>
       )
@@ -44,14 +49,12 @@ const StepIndicator = ({ current }: { current: number }) => (
 )
 
 const Booking = () => {
-  const booking = useBooking()
+  const booking       = useBooking()
   const [searchParams] = useSearchParams()
-  const preselect = searchParams.get('service') ?? undefined   // slug from ?service=<slug>
+  const preselect     = searchParams.get('service') ?? undefined
 
-  // If a service slug is in the URL but we're still on step 1 with nothing selected yet,
-  // let ServicePicker handle the auto-selection via its `preselect` prop.
-  // Reset the param once we've advanced past step 1 (no-op — URL params are read-only here).
   const canGoBack = booking.step > 1 && booking.step < 6 && !booking.bookingResult
+  const dur       = booking.selectedPrice?.durationMin ?? 60
 
   return (
     <Layout>
@@ -96,6 +99,7 @@ const Booking = () => {
 
         {booking.step === 2 && (
           <DatePicker
+            durationMin={dur}
             onSelect={date => {
               booking.setSelectedDate(date)
               booking.next()
@@ -106,8 +110,9 @@ const Booking = () => {
         {booking.step === 3 && booking.selectedDate && (
           <TimePicker
             date={booking.selectedDate}
-            onSelect={slot => {
-              booking.setSelectedSlot(slot)
+            durationMin={dur}
+            onSelect={time => {
+              booking.setSelectedTime(time)
               booking.next()
             }}
           />
@@ -139,13 +144,15 @@ const Booking = () => {
           && booking.bookingResult
           && booking.selectedService
           && booking.selectedDate
-          && booking.selectedSlot
+          && booking.selectedTime
+          && booking.selectedPrice
           && (
             <ConfirmScreen
               bookingRef={booking.bookingResult.booking_ref}
               serviceName={booking.selectedService.name}
+              durationMin={booking.selectedPrice.durationMin}
               date={booking.selectedDate}
-              time={booking.selectedSlot.slot_time}
+              time={booking.selectedTime}
               paymentMethod={booking.paymentMethod ?? 'on_site'}
             />
           )}

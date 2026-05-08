@@ -1,46 +1,65 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { db } from '../src/lib/neon'
-import { timeSlots, bookings } from '../drizzle/schema'
-import { eq, and, or, isNull, lt, sql } from 'drizzle-orm'
+import { bookings } from '../drizzle/schema'
+import { and, eq, inArray } from 'drizzle-orm'
 import { sendBookingNotification } from '../src/lib/telegram'
+
+function timeToMins(t: string): number {
+  const [h, m] = t.split(':').map(Number)
+  return h * 60 + m
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { slot_id, service_id, price_id, customer_name, customer_phone, payment_method } = req.body
+  const {
+    service_id, price_id,
+    booking_date, booking_time, duration_min,
+    customer_name, customer_phone, payment_method,
+  } = req.body
 
-  if (!slot_id || !service_id || !price_id || !customer_name || !customer_phone || !payment_method) {
+  if (!service_id || !price_id || !booking_date || !booking_time || !duration_min ||
+      !customer_name || !customer_phone || !payment_method) {
     return res.status(400).json({ error: 'All fields are required' })
   }
   if (!['stripe', 'on_site'].includes(payment_method)) {
     return res.status(400).json({ error: 'Invalid payment method' })
   }
 
-  try {
-    // Atomic lock: only succeeds if slot is truly free right now
-    const locked = await db
-      .update(timeSlots)
-      .set({ lockedUntil: sql`now() + interval '15 minutes'` })
-      .where(
-        and(
-          eq(timeSlots.id, slot_id),
-          eq(timeSlots.isAvailable, true),
-          or(isNull(timeSlots.lockedUntil), lt(timeSlots.lockedUntil, sql`now()`))
-        )
-      )
-      .returning({ id: timeSlots.id })
+  const dur = Number(duration_min)
 
-    if (locked.length === 0) {
-      return res.status(409).json({ error: 'Slot no longer available' })
+  try {
+    // ── Conflict check: fetch all bookings on this date ──────────────────────
+    const dayBookings = await db
+      .select({ bookingTime: bookings.bookingTime, durationMin: bookings.durationMin })
+      .from(bookings)
+      .where(and(
+        eq(bookings.bookingDate, booking_date),
+        inArray(bookings.bookingStatus, ['pending', 'confirmed']),
+      ))
+
+    const newStart = timeToMins(booking_time)
+    const newEnd   = newStart + dur
+
+    for (const b of dayBookings) {
+      if (!b.bookingTime) continue
+      const existStart = timeToMins(b.bookingTime)
+      const existEnd   = existStart + (b.durationMin ?? 60)
+      if (newStart < existEnd && newEnd > existStart) {
+        return res.status(409).json({ error: 'This slot was just taken. Please choose another time.' })
+      }
     }
 
+    // ── Insert booking ───────────────────────────────────────────────────────
     const [booking] = await db
       .insert(bookings)
       .values({
-        slotId: slot_id,
-        serviceId: service_id,
-        priceId: price_id,
-        customerName: customer_name,
+        serviceId:     service_id,
+        priceId:       price_id,
+        bookingDate:   booking_date,
+        bookingTime:   booking_time,
+        durationMin:   dur,
+        customerName:  customer_name,
         customerPhone: customer_phone,
         paymentMethod: payment_method,
         bookingStatus: 'pending',
@@ -48,10 +67,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
       .returning({ id: bookings.id })
 
-    const bookingId = booking.id
+    const bookingId  = booking.id
     const bookingRef = `AMK-${bookingId.split('-')[0].toUpperCase()}`
 
-    // Fire-and-forget — Vercel keeps the function alive until response is sent
+    // Fire-and-forget Telegram notification
     sendBookingNotification(bookingId).catch(err => console.error('[telegram]', err))
 
     return res.status(201).json({ booking_id: bookingId, booking_ref: bookingRef })
