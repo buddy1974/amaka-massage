@@ -3,21 +3,35 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   const url = process.env.DATABASE_URL
 
-  // Test DB without importing neon (pure env check)
-  const dbStatus = url
-    ? `set (${url.slice(0, 30)}…)`
-    : 'NOT SET'
+  const dbStatus = url ? `set (${url.slice(0, 30)}…)` : 'NOT SET'
 
-  // Try to actually connect
-  let dbResult = 'not tested'
+  // Test 1: raw neon SQL
+  let rawResult = 'not tested'
   if (url) {
     try {
       const { neon } = await import('@neondatabase/serverless')
       const sql = neon(url)
       const rows = await sql`SELECT count(*) as c FROM services WHERE is_active = true`
-      dbResult = `ok — ${rows[0]?.c ?? 0} active services`
+      rawResult = `ok — ${rows[0]?.c ?? 0} active services`
     } catch (e: unknown) {
-      dbResult = `error: ${e instanceof Error ? e.message : String(e)}`
+      rawResult = `error: ${e instanceof Error ? e.message : String(e)}`
+    }
+  }
+
+  // Test 2: drizzle query inline
+  let drizzleQuery = 'not tested'
+  if (url) {
+    try {
+      const { neon } = await import('@neondatabase/serverless')
+      const { drizzle } = await import('drizzle-orm/neon-http')
+      const { services } = await import('../drizzle/schema')
+      const { eq } = await import('drizzle-orm')
+      const sql = neon(url)
+      const db2 = drizzle(sql)
+      const rows = await db2.select({ id: services.id, name: services.name }).from(services).where(eq(services.isActive, true))
+      drizzleQuery = `ok — ${rows.length} services: ${rows.map(r => r.name).join(', ')}`
+    } catch (e: unknown) {
+      drizzleQuery = `error: ${e instanceof Error ? e.message : String(e)}`
     }
   }
 
@@ -25,7 +39,8 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
     ok: true,
     node: process.version,
     DATABASE_URL: dbStatus,
-    db: dbResult,
+    rawNeon: rawResult,
+    drizzleQuery,
     ts: new Date().toISOString(),
   })
 }
