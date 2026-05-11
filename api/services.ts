@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { db, services, servicePrices } from './_lib'
+import { getDb, services, servicePrices } from './_lib'
 import { eq, asc } from 'drizzle-orm'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const db = getDb()
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
   try {
@@ -47,6 +48,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(Object.values(map))
   } catch (err) {
     console.error('[services]', err)
-    return res.status(500).json({ error: 'Internal server error', debug: String(err) })
-  }
-}
+    return res.status(500).json({ error: 'Internal server error', debug: String(er

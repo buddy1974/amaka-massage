@@ -1,7 +1,7 @@
 /**
  * Telegram notification helper — lives inside api/ so Vercel bundles it.
  */
-import { db, bookings, services, servicePrices } from './_lib'
+import { getDb, bookings, services, servicePrices } from './_lib'
 import { eq } from 'drizzle-orm'
 
 function formatDate(dateStr: string): string {
@@ -12,6 +12,7 @@ function formatDate(dateStr: string): string {
 }
 
 export async function sendBookingNotification(bookingId: string): Promise<void> {
+  const db = getDb()
   const token  = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID
   if (!token || !chatId) {

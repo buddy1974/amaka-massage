@@ -1,8 +1,9 @@
 // Temporary diagnostic — delete after confirmed working
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { db, services } from './_lib'
+import { getDb, services } from './_lib'
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
+  const db = getDb()
   try {
     const rows = await db.select({ id: services.id, name: services.name }).from(services).limit(3)
     return res.status(200).json({ ok: true, rows })

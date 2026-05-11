@@ -63,9 +63,17 @@ export const blockedSlots = pgTable('blocked_slots', {
   createdAt:   timestamp('created_at', { withTimezone: true }).default(sql`now()`),
 })
 
-// ── DB instance ───────────────────────────────────────────────────────────────
+// ── DB instance — lazy so neon() is never called at module load time ──────────
 
-const _sql = neon(process.env.DATABASE_URL!)
-export const db = drizzle(_sql, {
-  schema: { services, servicePrices, timeSlots, bookings, blockedSlots },
-})
+let _db: ReturnType<typeof drizzle> | null = null
+
+export function getDb() {
+  if (!_db) {
+    const url = process.env.DATABASE_URL
+    if (!url) throw new Error('DATABASE_URL not set')
+    _db = drizzle(neon(url), {
+      schema: { services, servicePrices, timeSlots, bookings, blockedSlots },
+    })
+  }
+  return _db
+}
