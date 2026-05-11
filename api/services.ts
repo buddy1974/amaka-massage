@@ -9,13 +9,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const rows = await db
       .select({
-        serviceId: services.id,
-        serviceName: services.name,
-        serviceSlug: services.slug,
+        serviceId:          services.id,
+        serviceName:        services.name,
+        serviceSlug:        services.slug,
         serviceDescription: services.description,
-        priceId: servicePrices.id,
-        durationMin: servicePrices.durationMin,
-        priceEur: servicePrices.priceEur,
+        priceId:            servicePrices.id,
+        durationMin:        servicePrices.durationMin,
+        priceEur:           servicePrices.priceEur,
       })
       .from(services)
       .innerJoin(servicePrices, eq(servicePrices.serviceId, services.id))
@@ -23,10 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .orderBy(asc(services.name), asc(servicePrices.durationMin))
 
     type ServiceEntry = {
-      id: string
-      name: string
-      slug: string
-      description: string
+      id: string; name: string; slug: string; description: string
       prices: { id: string; duration_min: number; price_eur: number }[]
     }
 
@@ -50,7 +47,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json(Object.values(map))
   } catch (err) {
-    console.error('[services]', err)
-    return res.status(500).json({ error: 'Internal server error' })
+    const msg = err instanceof Error ? `${err.message}\n${err.stack}` : String(err)
+    console.error('[services]', msg)
+    return res.status(500).json({ error: 'Internal server error', debug: msg })
   }
 }
