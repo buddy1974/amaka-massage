@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { db } from '../src/lib/neon'
-import { bookings } from '../drizzle/schema'
+import { db, bookings } from './_lib'
 import { and, eq, inArray } from 'drizzle-orm'
-import { sendBookingNotification } from '../src/lib/telegram'
+import { sendBookingNotification } from './_telegram'
 
 function timeToMins(t: string): number {
   const [h, m] = t.split(':').map(Number)
@@ -29,7 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const dur = Number(duration_min)
 
   try {
-    // ── Conflict check: fetch all bookings on this date ──────────────────────
+    // Conflict check
     const dayBookings = await db
       .select({ bookingTime: bookings.bookingTime, durationMin: bookings.durationMin })
       .from(bookings)
@@ -50,7 +49,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // ── Insert booking ───────────────────────────────────────────────────────
     const [booking] = await db
       .insert(bookings)
       .values({
@@ -70,7 +68,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const bookingId  = booking.id
     const bookingRef = `AMK-${bookingId.split('-')[0].toUpperCase()}`
 
-    // Fire-and-forget Telegram notification
     sendBookingNotification(bookingId).catch(err => console.error('[telegram]', err))
 
     return res.status(201).json({ booking_id: bookingId, booking_ref: bookingRef })

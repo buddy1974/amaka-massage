@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { db } from '../src/lib/neon'
-import { bookings, blockedSlots } from '../drizzle/schema'
+import { db, bookings, blockedSlots } from './_lib'
 import { and, eq, gte, lte, inArray } from 'drizzle-orm'
 
 const HOURS: Record<number, { open: number; close: number } | null> = {

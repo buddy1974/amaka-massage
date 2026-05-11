@@ -1,20 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { jwtVerify } from 'jose'
-import { db } from '../../src/lib/neon'
-import { bookings, services, servicePrices } from '../../drizzle/schema'
+import { db, bookings, services, servicePrices } from '../_lib'
 import { eq, desc } from 'drizzle-orm'
 
 async function verifyAdmin(req: VercelRequest): Promise<boolean> {
   try {
     const auth = req.headers.authorization
     if (!auth?.startsWith('Bearer ')) return false
-    const token = auth.slice(7)
-    const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET!)
-    await jwtVerify(token, secret)
+    await jwtVerify(auth.slice(7), new TextEncoder().encode(process.env.ADMIN_JWT_SECRET!))
     return true
-  } catch {
-    return false
-  }
+  } catch { return false }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -22,10 +17,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   if (req.method === 'OPTIONS') return res.status(204).end()
-
   if (!(await verifyAdmin(req))) return res.status(401).json({ error: 'Unauthorized' })
 
-  // GET — list all bookings
   if (req.method === 'GET') {
     const rows = await db
       .select({
@@ -49,7 +42,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.json(rows)
   }
 
-  // PATCH — update booking status
   if (req.method === 'PATCH') {
     const { id, bookingStatus } = req.body as { id?: string; bookingStatus?: string }
     if (!id || !bookingStatus) return res.status(400).json({ error: 'id and bookingStatus required' })

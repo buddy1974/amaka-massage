@@ -1,7 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Stripe from 'stripe'
-import { db } from '../src/lib/neon'
-import { bookings, services, servicePrices } from '../drizzle/schema'
+import { db, bookings, services, servicePrices } from './_lib'
 import { eq } from 'drizzle-orm'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_placeholder')
@@ -35,24 +34,23 @@ function formatDate(dateStr: string): string {
 async function getBooking(bookingId: string) {
   const rows = await db
     .select({
-      id:                      bookings.id,
-      customerName:            bookings.customerName,
-      customerPhone:           bookings.customerPhone,
-      paymentMethod:           bookings.paymentMethod,
-      paymentStatus:           bookings.paymentStatus,
-      stripePaymentIntentId:   bookings.stripePaymentIntentId,
-      bookingDate:             bookings.bookingDate,
-      bookingTime:             bookings.bookingTime,
-      durationMin:             bookings.durationMin,
-      serviceName:             services.name,
-      priceEur:                servicePrices.priceEur,
+      id:                    bookings.id,
+      customerName:          bookings.customerName,
+      customerPhone:         bookings.customerPhone,
+      paymentMethod:         bookings.paymentMethod,
+      paymentStatus:         bookings.paymentStatus,
+      stripePaymentIntentId: bookings.stripePaymentIntentId,
+      bookingDate:           bookings.bookingDate,
+      bookingTime:           bookings.bookingTime,
+      durationMin:           bookings.durationMin,
+      serviceName:           services.name,
+      priceEur:              servicePrices.priceEur,
     })
     .from(bookings)
     .innerJoin(services,      eq(bookings.serviceId, services.id))
     .innerJoin(servicePrices, eq(bookings.priceId,   servicePrices.id))
     .where(eq(bookings.id, bookingId))
     .limit(1)
-
   return rows[0] ?? null
 }
 
@@ -90,7 +88,6 @@ async function editMessage(chatId: number, messageId: number, text: string): Pro
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Always 200 — Telegram retries on non-200
   if (req.method !== 'POST') return res.status(200).json({ ok: true })
 
   try {
@@ -111,17 +108,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true })
     }
 
-    // ── CONFIRM ──────────────────────────────────────────────────────────────
     if (action === 'confirm') {
       await db.update(bookings).set({ bookingStatus: 'confirmed' }).where(eq(bookings.id, bookingId))
       await tg('answerCallbackQuery', { callback_query_id: callbackQueryId, text: '✅ Buchung bestätigt!' })
       await editMessage(chatId, messageId, buildText(booking, bookingId, '\n\n✅ BESTÄTIGT'))
     }
 
-    // ── CANCEL ───────────────────────────────────────────────────────────────
     if (action === 'cancel') {
       await db.update(bookings).set({ bookingStatus: 'cancelled' }).where(eq(bookings.id, bookingId))
-
       let suffix = '\n\n❌ ABGESAGT'
 
       if (booking.paymentStatus === 'paid' && booking.stripePaymentIntentId) {
@@ -135,7 +129,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   } catch (err) {
     console.error('[telegram-webhook]', err)
-    // swallow — must return 200 or Telegram retries
   }
 
   return res.status(200).json({ ok: true })

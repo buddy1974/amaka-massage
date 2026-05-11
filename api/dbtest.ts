@@ -1,7 +1,6 @@
-// Temporary diagnostic — delete after root cause confirmed
+// Temporary diagnostic — delete after confirmed working
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { db } from '../src/lib/neon'
-import { services } from '../drizzle/schema'
+import { db, services } from './_lib'
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   try {

@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { db } from '../src/lib/neon'
-import { services, servicePrices } from '../drizzle/schema'
+import { db, services, servicePrices } from './_lib'
 import { eq, asc } from 'drizzle-orm'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -47,8 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json(Object.values(map))
   } catch (err) {
-    const msg = err instanceof Error ? `${err.message}\n${err.stack}` : String(err)
-    console.error('[services]', msg)
-    return res.status(500).json({ error: 'Internal server error', debug: msg })
+    console.error('[services]', err)
+    return res.status(500).json({ error: 'Internal server error', debug: String(err) })
   }
 }
