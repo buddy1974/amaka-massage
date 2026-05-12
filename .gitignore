@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# FUSE filesystem artefacts (Linux sandbox)
+.fuse_hidden*
