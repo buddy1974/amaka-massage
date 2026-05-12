@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getDb, timeSlots, bookings } from './_lib'
+import { getDb, timeSlots, bookings } from './_lib.js'
 import { and, isNotNull, lt, ne, notInArray, sql } from 'drizzle-orm'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

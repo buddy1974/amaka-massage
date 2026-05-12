@@ -1,6 +1,6 @@
 // Temporary diagnostic — delete after confirmed working
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getDb, services } from './_lib'
+import { getDb, services } from './_lib.js'
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   const db = getDb()

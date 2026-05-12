@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { jwtVerify } from 'jose'
-import { getDb, bookings, services, servicePrices } from '../_lib'
+import { getDb, bookings, services, servicePrices } from '../_lib.js'
 import { eq, desc } from 'drizzle-orm'
 
 async function verifyAdmin(req: VercelRequest): Promise<boolean> {

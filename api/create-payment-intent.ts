@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Stripe from 'stripe'
-import { getDb, bookings, servicePrices, services } from './_lib'
+import { getDb, bookings, servicePrices, services } from './_lib.js'
 import { eq } from 'drizzle-orm'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)

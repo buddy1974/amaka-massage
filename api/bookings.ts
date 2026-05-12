@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getDb, bookings } from './_lib'
+import { getDb, bookings } from './_lib.js'
 import { and, eq, inArray } from 'drizzle-orm'
-import { sendBookingNotification } from './_telegram'
+import { sendBookingNotification } from './_telegram.js'
 
 function timeToMins(t: string): number {
   const [h, m] = t.split(':').map(Number)

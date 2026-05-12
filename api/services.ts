@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getDb, services, servicePrices } from './_lib'
+import { getDb, services, servicePrices } from './_lib.js'
 import { eq, asc } from 'drizzle-orm'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

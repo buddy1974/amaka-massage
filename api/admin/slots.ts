@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { jwtVerify } from 'jose'
-import { getDb, timeSlots } from '../_lib'
+import { getDb, timeSlots } from '../_lib.js'
 import { eq, and, gte, lte } from 'drizzle-orm'
 
 // Opening hours — inlined from src/lib/openingHours.ts (no cross-dir import needed)

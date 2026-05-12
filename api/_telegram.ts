@@ -1,7 +1,7 @@
 /**
  * Telegram notification helper — lives inside api/ so Vercel bundles it.
  */
-import { getDb, bookings, services, servicePrices } from './_lib'
+import { getDb, bookings, services, servicePrices } from './_lib.js'
 import { eq } from 'drizzle-orm'
 
 function formatDate(dateStr: string): string {
