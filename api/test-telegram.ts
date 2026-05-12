@@ -7,38 +7,37 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
   const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID
 
   const result: Record<string, unknown> = {
-    token_set:    !!token,
-    token_prefix: token ? token.slice(0, 10) + '…' : null,
-    chat_id_env:  chatId ?? null,
+    token_set:   !!token,
+    chat_id_env: chatId ?? null,
   }
 
   if (!token) return res.status(200).json(result)
 
-  // 1. Verify bot identity
+  // 1. Bot identity
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/getMe`)
     const d = await r.json()
-    result.bot = d.ok ? `@${d.result.username} (id ${d.result.id})` : d
+    result.bot = d.ok ? `@${d.result.username}` : d
   } catch (e) { result.getMe_error = String(e) }
 
-  // 2. Get recent updates — shows who has messaged the bot and their chat IDs
-  try {
-    const r = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=10`)
-    const d = await r.json()
-    if (d.ok && d.result.length > 0) {
-      result.recent_chats = d.result.map((u: { message?: { chat: { id: number; first_name?: string; username?: string }; from?: { username?: string } } }) => ({
-        chat_id:    u.message?.chat?.id,
-        name:       u.message?.chat?.first_name,
-        username:   u.message?.chat?.username ?? u.message?.from?.username,
-      }))
-    } else {
-      result.recent_chats = d.ok
-        ? 'NO MESSAGES YET — Amaka must open @Amakamassagebot in Telegram and press Start'
-        : d
-    }
-  } catch (e) { result.getUpdates_error = String(e) }
+  // 2. Info about the current chat_id (type + title)
+  if (chatId) {
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${chatId}`)
+      const d = await r.json()
+      if (d.ok) {
+        result.current_chat = {
+          id:    d.result.id,
+          type:  d.result.type,
+          title: d.result.title ?? d.result.first_name ?? '(no title)',
+        }
+      } else {
+        result.current_chat_error = d.description
+      }
+    } catch (e) { result.getChat_error = String(e) }
+  }
 
-  // 3. Try sending with current env chat_id
+  // 3. Send test message
   if (chatId) {
     try {
       const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -46,7 +45,7 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id:    chatId,
-          text:       '🔔 Test — Amaka Buchungssystem aktiv ✅',
+          text:       '🔔 <b>Test</b> — Amaka Buchungssystem aktiv ✅',
           parse_mode: 'HTML',
         }),
       })
@@ -55,9 +54,9 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
     } catch (e) { result.sendMessage_error = String(e) }
   }
 
-  // 4. Last booking in DB
+  // 4. Last booking
   try {
-    const db   = getDb()
+    const db = getDb()
     const rows = await db
       .select({ id: bookings.id, createdAt: bookings.createdAt, customerName: bookings.customerName })
       .from(bookings).orderBy(desc(bookings.createdAt)).limit(1)
