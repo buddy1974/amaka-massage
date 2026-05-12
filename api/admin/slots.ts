@@ -69,4 +69,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'PATCH') {
     const { id, isAvailable } = req.body as { id?: string; isAvailable?: boolean }
     if (!id || isAvailable === undefined) return res.status(400).json({ error: 'id and isAvailable required' })
- 
+    await db.update(timeSlots).set({ isAvailable }).where(eq(timeSlots.id, id))
+    return res.json({ ok: true })
+  }
+
+  if (req.method === 'DELETE') {
+    const { id } = req.body as { id?: string }
+    if (!id) return res.status(400).json({ error: 'id required' })
+    await db.delete(timeSlots).where(eq(timeSlots.id, id))
+    return res.json({ ok: true })
+  }
+
+  return res.status(405).end()
+}

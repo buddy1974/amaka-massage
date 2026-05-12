@@ -48,4 +48,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(Object.values(map))
   } catch (err) {
     console.error('[services]', err)
-    return res.status(500).json({ error: 'Internal server error', debug: String(er
+    return res.status(500).json({ error: 'Internal server error', debug: String(err) })
+  }
+}
