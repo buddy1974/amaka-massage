@@ -1,6 +1,8 @@
-import { CheckCircle2, Calendar, Clock, CreditCard, Phone } from 'lucide-react'
+import { CheckCircle2, Calendar, Clock, CreditCard, Phone, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
+
+const AMAKA_WA = '4915213928938'
 
 interface Props {
   bookingRef:    string
@@ -9,6 +11,7 @@ interface Props {
   date:          string
   time:          string
   paymentMethod: 'stripe' | 'on_site'
+  customerPhone?: string
 }
 
 function formatDate(ds: string): string {
@@ -18,7 +21,19 @@ function formatDate(ds: string): string {
   })
 }
 
-export const ConfirmScreen = ({ bookingRef, serviceName, durationMin, date, time, paymentMethod }: Props) => (
+function buildWhatsAppUrl(ref: string, serviceName: string, durationMin: number, date: string, time: string): string {
+  const msg = [
+    `Hallo Amaka, ich habe soeben einen Termin gebucht:`,
+    `Ref: ${ref}`,
+    `Massage: ${serviceName} – ${durationMin} Min.`,
+    `Datum: ${formatDate(date)}`,
+    `Uhrzeit: ${time.slice(0, 5)} Uhr`,
+    `Bitte bestätigen. Danke!`,
+  ].join('\n')
+  return `https://wa.me/${AMAKA_WA}?text=${encodeURIComponent(msg)}`
+}
+
+export const ConfirmScreen = ({ bookingRef, serviceName, durationMin, date, time, paymentMethod, customerPhone: _customerPhone }: Props) => (
   <div className="text-center py-4">
     <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
     <h2 className="font-serif text-3xl text-primary-deep mb-2">Buchung bestätigt!</h2>
@@ -63,10 +78,27 @@ export const ConfirmScreen = ({ bookingRef, serviceName, durationMin, date, time
       </div>
     </div>
 
+    {/* WhatsApp confirmation — opens chat to Amaka with booking details pre-filled */}
+    <a
+      href={buildWhatsAppUrl(bookingRef, serviceName, durationMin, date, time)}
+      target="_blank"
+      rel="noreferrer"
+      className="block max-w-sm mx-auto mb-3"
+    >
+      <Button className="w-full bg-[#25D366] hover:bg-[#1ebe5d] text-white gap-2">
+        <MessageCircle className="h-4 w-4" />
+        Buchung per WhatsApp bestätigen
+      </Button>
+    </a>
+    <p className="text-xs text-muted-foreground mb-8">
+      Öffnet WhatsApp mit Ihren Buchungsdetails – einfach absenden.
+    </p>
+
     <p className="text-sm text-muted-foreground mb-6">
-      Bei Fragen: <a href="tel:015906306248" className="text-primary font-medium hover:underline">0159 06306248</a>{' '}
-      oder{' '}
-      <a href="https://wa.me/49015213928938" target="_blank" rel="noreferrer" className="text-primary font-medium hover:underline">
+      Bei Fragen:{' '}
+      <a href="tel:015906306248" className="text-primary font-medium hover:underline">0159 06306248</a>
+      {' '}oder{' '}
+      <a href="https://wa.me/4915213928938" target="_blank" rel="noreferrer" className="text-primary font-medium hover:underline">
         WhatsApp
       </a>
     </p>

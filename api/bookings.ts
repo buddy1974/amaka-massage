@@ -69,7 +69,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const bookingId  = booking.id
     const bookingRef = `AMK-${bookingId.split('-')[0].toUpperCase()}`
 
-    sendBookingNotification(bookingId).catch(err => console.error('[telegram]', err))
+    // Await the notification — fire-and-forget dies when res.json() closes the Lambda.
+    // 4 s timeout so a slow Telegram API never blocks the booking response.
+    await Promise.race([
+      sendBookingNotification(bookingId),
+      new Promise<void>(resolve => setTimeout(resolve, 4000)),
+    ]).catch(err => console.error('[telegram]', err))
 
     return res.status(201).json({ booking_id: bookingId, booking_ref: bookingRef })
   } catch (err) {

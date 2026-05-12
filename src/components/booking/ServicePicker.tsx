@@ -74,6 +74,16 @@ export const ServicePicker = ({ onSelect, preselect }: Props) => {
     setSelected({ serviceId: svc.id, priceId: price.id })
   }
 
+  /** Double-click selects the card AND immediately advances to the next step */
+  const handleDoubleClick = (svc: ApiService) => {
+    const price = defaultPrice(svc.prices)
+    setSelected({ serviceId: svc.id, priceId: price.id })
+    onSelect(
+      { id: svc.id, name: svc.name, slug: svc.slug },
+      { id: price.id, durationMin: price.duration_min, priceEur: price.price_eur }
+    )
+  }
+
   const handlePriceClick = (svcId: string, priceId: string) => {
     setSelected({ serviceId: svcId, priceId })
   }
@@ -152,6 +162,7 @@ export const ServicePicker = ({ onSelect, preselect }: Props) => {
             <div
               key={svc.id}
               onClick={() => handleCardClick(svc)}
+              onDoubleClick={() => handleDoubleClick(svc)}
               role="button"
               tabIndex={0}
               onKeyDown={e => e.key === 'Enter' && handleCardClick(svc)}
