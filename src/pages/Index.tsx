@@ -26,13 +26,13 @@ const Index = () => (
       <div className="relative container py-24">
         <div className="max-w-2xl">
           <p className="text-accent font-medium tracking-[0.25em] uppercase text-sm mb-4">
-            Essen · Premium Wellness
+            Essen · Traditionelle Massage · Afro Touch
           </p>
           <h1 className="font-serif text-5xl md:text-7xl font-bold text-white leading-tight">
-            AMAKA'S CITY
+            Amaka's City Afro Touch
           </h1>
           <p className="text-accent/90 text-xl md:text-2xl mt-2 font-light">
-            Traditionelle Massage und Wellness Spa Salon
+            Traditionelle Massage – Essen
           </p>
           <p className="text-white/75 text-lg mt-5 leading-relaxed max-w-lg">
             Entspannen Sie Körper und Geist. Erleben Sie authentische afrikanische Massagetechniken in ruhiger, privater Atmosphäre.
@@ -340,6 +340,14 @@ const Index = () => (
         </div>
       </div>
     </section>
+
+    {/* Legal notice */}
+    <div className="container pb-10 max-w-3xl text-center">
+      <p className="text-xs text-muted-foreground">
+        Alle Massagen sind reine Wellnessanwendungen zur Entspannung. Keine Diagnosen oder Heilbehandlungen.
+      </p>
+      <p className="text-xs font-bold text-destructive uppercase tracking-widest mt-1">⛔ Keine Erotikmassage</p>
+    </div>
 
   </Layout>
 );

@@ -8,8 +8,8 @@ export const Footer = () => (
         <Link to="/">
           <img src="/logo.png" alt="Amaka's City" className="h-16 w-auto object-contain brightness-0 invert mb-3" />
         </Link>
-        <p className="text-sm opacity-80 leading-relaxed font-semibold">AMAKA'S CITY</p>
-        <p className="text-xs opacity-60 leading-relaxed mt-1">Traditionelle Massage und Wellness Spa Salon</p>
+        <p className="text-sm opacity-80 leading-relaxed font-semibold">Amaka's City Afro Touch</p>
+        <p className="text-xs opacity-60 leading-relaxed mt-1">Traditionelle Massage – Essen</p>
         <div className="flex items-center gap-1.5 mt-3 text-xs opacity-70">
           <CreditCard className="h-3.5 w-3.5 shrink-0" />
           <span>Kartenzahlung akzeptiert</span>
@@ -49,11 +49,12 @@ export const Footer = () => (
       </div>
     </div>
     <div className="border-t border-primary-foreground/10 container py-4">
-      <p className="text-xs text-center opacity-50">Hinweis: Unsere Massagen verstehen sich als Wellnessbehandlung. Keine Diagnosen oder Heilbehandlungen. Keine Erotikmassage.</p>
+      <p className="text-xs text-center opacity-50">Hinweis: Unsere Massagen verstehen sich als Wellnessbehandlung. Keine Diagnosen oder Heilbehandlungen.</p>
+      <p className="text-xs text-center font-bold tracking-widest uppercase mt-1 opacity-80">⛔ Keine Erotikmassage</p>
     </div>
     <div className="border-t border-primary-foreground/10">
       <div className="container py-5 text-xs text-center opacity-60 space-y-1">
-        <p>© {new Date().getFullYear()} AMAKA'S CITY – Essen. Alle Rechte vorbehalten.</p>
+        <p>© {new Date().getFullYear()} Amaka's City Afro Touch – Essen. Alle Rechte vorbehalten.</p>
         <p>Developed by <a href="https://maxpromo.digital" target="_blank" rel="noreferrer"
           className="hover:opacity-100 underline underline-offset-2">maxpromo.digital</a></p>
       </div>
