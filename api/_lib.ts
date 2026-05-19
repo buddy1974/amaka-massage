@@ -46,6 +46,7 @@ export const bookings = pgTable('bookings', {
   durationMin:            integer('duration_min'),
   customerName:           text('customer_name').notNull(),
   customerPhone:          text('customer_phone').notNull(),
+  customerEmail:          text('customer_email'),
   paymentMethod:          text('payment_method').notNull(),
   paymentStatus:          text('payment_status').default('pending'),
   stripePaymentIntentId:  text('stripe_payment_intent_id'),

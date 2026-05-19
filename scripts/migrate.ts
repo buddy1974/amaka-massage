@@ -14,14 +14,14 @@ for (const f of ['.env.local', '.env']) {
 const sql = neon(process.env.DATABASE_URL!)
 
 async function migrate() {
-  console.log('Running migrations…')
+  console.log('Running migrations...')
 
   // 1. New booking columns
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_date DATE`
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_time TIME`
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS duration_min INTEGER`
   await sql`ALTER TABLE bookings ALTER COLUMN slot_id DROP NOT NULL`
-  console.log('✓ bookings: date/time columns added, slot_id nullable')
+  console.log('done: bookings date/time columns added, slot_id nullable')
 
   // 2. Blocked slots table for walk-in / phone bookings
   await sql`
@@ -34,7 +34,11 @@ async function migrate() {
       created_at   TIMESTAMP WITH TIME ZONE DEFAULT now()
     )
   `
-  console.log('✓ blocked_slots table ready')
+  console.log('done: blocked_slots table ready')
+
+  // 3. Customer email for booking confirmations
+  await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS customer_email TEXT`
+  console.log('done: bookings customer_email column added')
 
   console.log('\nAll migrations complete!')
 }

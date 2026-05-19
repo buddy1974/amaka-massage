@@ -62,7 +62,7 @@ const Booking = () => {
         <div className="container text-center">
           <Flower2 className="h-6 w-6 text-primary mx-auto mb-2" />
           <h1 className="font-serif text-4xl text-primary-deep">Termin buchen</h1>
-          <p className="font-script text-xl text-primary mt-1">AMAKA'S CITY – Wellness Spa Essen</p>
+          <p className="font-script text-xl text-primary mt-1">Amaka's City Afro Touch – Essen</p>
         </div>
       </section>
 
@@ -122,9 +122,11 @@ const Booking = () => {
           <CustomerForm
             initialName={booking.customerName}
             initialPhone={booking.customerPhone}
-            onSubmit={(name, phone) => {
+            initialEmail={booking.customerEmail}
+            onSubmit={(name, phone, email) => {
               booking.setCustomerName(name)
               booking.setCustomerPhone(phone)
+              booking.setCustomerEmail(email)
               booking.next()
             }}
           />

@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getDb, bookings } from './_lib.js'
 import { and, eq, inArray } from 'drizzle-orm'
 import { sendBookingNotification } from './_telegram.js'
+import { sendBookingEmail } from './_email.js'
 
 function timeToMins(t: string): number {
   const [h, m] = t.split(':').map(Number)
@@ -15,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const {
     service_id, price_id,
     booking_date, booking_time, duration_min,
-    customer_name, customer_phone, payment_method,
+    customer_name, customer_phone, customer_email, payment_method,
   } = req.body
 
   if (!service_id || !price_id || !booking_date || !booking_time || !duration_min ||
@@ -60,6 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         durationMin:   dur,
         customerName:  customer_name,
         customerPhone: customer_phone,
+        customerEmail: customer_email || null,
         paymentMethod: payment_method,
         bookingStatus: 'pending',
         paymentStatus: 'pending',
@@ -69,12 +71,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const bookingId  = booking.id
     const bookingRef = `AMK-${bookingId.split('-')[0].toUpperCase()}`
 
-    // Await the notification — fire-and-forget dies when res.json() closes the Lambda.
-    // 4 s timeout so a slow Telegram API never blocks the booking response.
+    // Fire Telegram + email notifications concurrently.
+    // 4 s timeout so a slow external API never blocks the booking response.
     await Promise.race([
-      sendBookingNotification(bookingId),
+      Promise.all([
+        sendBookingNotification(bookingId).catch(err => console.error('[telegram]', err)),
+        sendBookingEmail(bookingId).catch(err => console.error('[email]', err)),
+      ]),
       new Promise<void>(resolve => setTimeout(resolve, 4000)),
-    ]).catch(err => console.error('[telegram]', err))
+    ])
 
     return res.status(201).json({ booking_id: bookingId, booking_ref: bookingRef })
   } catch (err) {

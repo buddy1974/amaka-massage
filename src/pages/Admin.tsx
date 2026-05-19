@@ -253,7 +253,7 @@ export default function Admin() {
             <img src="/logo.png" alt="Amaka" className="h-10 w-auto object-contain brightness-0 invert" />
             <div>
               <div className="font-serif text-lg leading-tight">Admin Dashboard</div>
-              <div className="text-xs opacity-70">AMAKA'S CITY – Essen</div>
+              <div className="text-xs opacity-70">Amaka's City Afro Touch – Essen</div>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={logout}

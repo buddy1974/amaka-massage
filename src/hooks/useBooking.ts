@@ -27,6 +27,7 @@ export function useBooking() {
   const [selectedTime,    setSelectedTime]    = useState<string | null>(null)
   const [customerName,    setCustomerName]    = useState('')
   const [customerPhone,   setCustomerPhone]   = useState('')
+  const [customerEmail,   setCustomerEmail]   = useState('')
   const [paymentMethod,   setPaymentMethod]   = useState<'stripe' | 'on_site' | null>(null)
   const [bookingResult,   setBookingResult]   = useState<BookingResult | null>(null)
   const [submitting,      setSubmitting]      = useState(false)
@@ -48,13 +49,14 @@ export function useBooking() {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          service_id:    selectedService.id,
-          price_id:      selectedPrice.id,
-          booking_date:  selectedDate,
-          booking_time:  selectedTime,
-          duration_min:  selectedPrice.durationMin,
+          service_id:     selectedService.id,
+          price_id:       selectedPrice.id,
+          booking_date:   selectedDate,
+          booking_time:   selectedTime,
+          duration_min:   selectedPrice.durationMin,
           customer_name:  customerName,
           customer_phone: customerPhone,
+          customer_email: customerEmail || undefined,
           payment_method: method,
         }),
       })
@@ -87,10 +89,10 @@ export function useBooking() {
 
   return {
     step, selectedService, selectedPrice, selectedDate, selectedTime,
-    customerName, customerPhone, paymentMethod, bookingResult,
+    customerName, customerPhone, customerEmail, paymentMethod, bookingResult,
     submitting, submitError,
     setSelectedService, setSelectedPrice, setSelectedDate, setSelectedTime,
-    setCustomerName, setCustomerPhone,
+    setCustomerName, setCustomerPhone, setCustomerEmail,
     next, back, submit,
   }
 }

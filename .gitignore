@@ -25,3 +25,6 @@ dist-ssr
 
 # FUSE filesystem artefacts (Linux sandbox)
 .fuse_hidden*
+
+# FUSE filesystem artefacts (Linux sandbox)
+.fuse_hidden*
